@@ -1,0 +1,5 @@
+org.springframework.boot.env.EnvironmentPostProcessor=bootiful.asciidoctor.ForwardingEnvironmentPostProcessor
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  bootiful.asciidoctor.publishers.DocumentPublisherAutoConfiguration, \
+  bootiful.asciidoctor.AsciidoctorPublicationJobAutoConfiguration , \
+  bootiful.asciidoctor.git.GitAutoConfiguration

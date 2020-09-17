@@ -1,0 +1,50 @@
+= Asciidoctor publication job
+
+A Spring Batch `Job` that publishes technical books using Asciidoctor.
+
+== Basic Implementation
+
+This project represents a Spring Batch `Job` that has two major steps:
+
+* the first `Step` loads all the pre-requisite Git repositories (concurrently).
+As this may be an unknown quantity, we've specified that we should use an `ItemReader<T>` whose values are processed concurrently.
+* the second `Step` invokes all the `DocumentProducer` instances (concurrently).
+While we know that there are at most as many `Flow` instances as there are `DocumentProducer` instances, we don't know how many `DocumentProducer` steps there will be.
+After all those are only registered if the user doesn't disable one of them by setting, e.g., `publication.mobi.enabled=false` (or `export PUBLICATION_MOBI_ENABLED=false`).
+So, we use a `BeanFactoryPostProcessor` to dynamically register the corresponding `Flow` instances.
+But it works!
+Register two `DocumementProducer` instances, and you'll see two concurrent `Flow` instances.
+
+== To Do
+
+* publish `ApplicationContextEvent` after each `DocumentProducer` is finished.
+That way, information about the files produced could be communicated as an event.
+
+== Getting Started
+
+In theory, you can add this to any Spring Boot application.
+You'll need to configure a few things.
+
+.`application.properties`
+[source,properties]
+----
+# <1>
+publication.book-name=Bootiful Asciidoctor
+# <2>
+pipeline.job.root=${HOME}/Desktop/root
+# <3>
+pipeline.job.target=${HOME}/Desktop/target
+# <4>
+pipeline.job.document-repository=https://github.com/bootiful-asciidoctor/sample-book.git
+# <5>
+pipeline.job.include-repositories=\
+  https://github.com/reactive-spring-book/orchestration.git,\
+  https://github.com/reactive-spring-book/io.git,\
+  https://github.com/reactive-spring-book/data.git
+----
+<1> The first configuration value is the name of the book.
+That's used a _ton_ so make sure to specify it.
+<2> `pipeline.job.root` specifies where to clone all the Git repositories..
+<3> `pipeline.job.target` specifies where to dump the tree of resulting artifacts after the document generation has completed
+<4> The pipeline assumes that the documents for the book live in one Git repository...
+<5> while the code to be used as includes in the book live in zero or more others.
