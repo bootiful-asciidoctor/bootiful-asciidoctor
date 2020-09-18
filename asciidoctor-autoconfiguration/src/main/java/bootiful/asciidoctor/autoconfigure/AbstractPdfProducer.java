@@ -73,22 +73,22 @@ abstract class AbstractPdfProducer implements DocumentProducer {
         }
 
         var process = new ProcessBuilder()
-                .command( "asciidoctor-pdf-optimize", file.getAbsolutePath())
+                .command("asciidoctor-pdf-optimize", file.getAbsolutePath())
                 .inheritIO()
-                .directory( file.getParentFile())
-                .start() ;
+                .directory(file.getParentFile())
+                .start();
 
-        var exitCode =  process.waitFor();
+        var exitCode = process.waitFor();
 
 /*
         var process = Runtime.getRuntime() //
                 .exec("asciidoctor-pdf-optimize "
                         + file.getAbsolutePath() *//*
-                 * todo make this work again +
-                 * " --quality " + configuration.
-                 * getPdfOptimizerQuality().name().
-                 * toLowerCase()
-                 *//*
+         * todo make this work again +
+         * " --quality " + configuration.
+         * getPdfOptimizerQuality().name().
+         * toLowerCase()
+         *//*
                 );
         var exitCode = process.waitFor();*/
         if (log.isDebugEnabled()) {
@@ -116,9 +116,9 @@ abstract class AbstractPdfProducer implements DocumentProducer {
             File compressedFile = new File(this.properties.getRoot(), "index-optimized-" + media.toLowerCase() + ".pdf");
             bootiful.asciidoctor.autoconfigure.FileCopyUtils.copy(regularFile, compressedFile);
 
-            optimizeOutputPdf( compressedFile);
+            optimizeOutputPdf(compressedFile);
 
-            files.add ( compressedFile) ;
+            files.add(compressedFile);
 
         }
         return files.toArray(new File[0]);
