@@ -2,7 +2,6 @@ package bootiful.asciidoctor;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
 import javax.annotation.PostConstruct;

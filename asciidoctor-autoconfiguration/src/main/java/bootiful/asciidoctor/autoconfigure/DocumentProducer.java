@@ -1,6 +1,5 @@
 package bootiful.asciidoctor.autoconfigure;
 
-import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.AttributesBuilder;
 import org.asciidoctor.OptionsBuilder;
 import org.asciidoctor.SafeMode;

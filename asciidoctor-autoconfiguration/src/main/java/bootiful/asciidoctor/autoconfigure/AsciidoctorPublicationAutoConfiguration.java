@@ -7,9 +7,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.*;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.io.Resource;
+import org.springframework.core.type.AnnotatedTypeMetadata;
 
 @Log4j2
 @Configuration(proxyBeanMethods = false)
@@ -23,8 +25,12 @@ class AsciidoctorPublicationAutoConfiguration {
 		return new EpubProducer(pp, asciidoctor);
 	}
 
+	/**
+	 * this only works if you've opted into it <em>and</em> you're running on Linux
+	 */
 	@Bean
-	@ConditionalOnProperty(name = "publication.mobi.enabled", havingValue = "true", matchIfMissing = true)
+	@Conditional(LinuxCondition.class)
+	@ConditionalOnProperty(name = "publication.mobi.enabled", havingValue = "true", matchIfMissing = false)
 	MobiProducer mobiProducer(PublicationProperties pp, @Value("classpath:/kindlegen") Resource kindlegen,
 			Asciidoctor asciidoctor) throws Exception {
 		return new MobiProducer(pp, asciidoctor, kindlegen);
@@ -61,6 +67,16 @@ class AsciidoctorPublicationAutoConfiguration {
 	@ConditionalOnProperty(name = "publication.pdf.prepress.enabled", havingValue = "true", matchIfMissing = true)
 	PrepressPdfProducer prepressPdfProducer(PublicationProperties pp, Asciidoctor asciidoctor) {
 		return new PrepressPdfProducer(pp, asciidoctor);
+	}
+
+}
+
+@Order(Ordered.HIGHEST_PRECEDENCE + 20)
+class LinuxCondition implements Condition {
+
+	@Override
+	public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+		return System.getProperty("os.name").toLowerCase().contains("linux");
 	}
 
 }

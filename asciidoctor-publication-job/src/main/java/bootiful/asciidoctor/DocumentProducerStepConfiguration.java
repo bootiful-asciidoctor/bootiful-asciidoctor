@@ -3,7 +3,6 @@ package bootiful.asciidoctor;
 import bootiful.asciidoctor.autoconfigure.DocumentProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.asciidoctor.Asciidoctor;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.flow.Flow;

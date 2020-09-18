@@ -4,7 +4,6 @@ import bootiful.asciidoctor.DocumentsPublishedEvent;
 import lombok.extern.log4j.Log4j2;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.batch.JobExecutionEvent;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -14,16 +13,7 @@ import org.springframework.core.env.Environment;
 
 @Log4j2
 @SpringBootApplication
-public class AsciidoctorPublicationJobApplication {
-
-	public static void main(String[] args) {
-		if (System.getenv("OS") != null
-				&& System.getenv("OS").strip().trim().toLowerCase().equalsIgnoreCase("darwin")) {
-			System.setProperty("publication.mobi.enabled", "false");
-		}
-		System.setProperty("spring.profiles.active", "git");
-		SpringApplication.run(AsciidoctorPublicationJobApplication.class, args);
-	}
+class AsciidoctorPublicationJobApplication {
 
 	@Bean
 	UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider(@Value("${GIT_USERNAME}") String user,
