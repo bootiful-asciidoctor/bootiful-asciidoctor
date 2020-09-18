@@ -8,6 +8,9 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
   GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
+  KINDLEGEN: /home/runner/bin/kindlegen/kindlegen
+  GIT_ARTIFACT_BRANCH: ${{ secrets.GIT_ARTIFACT_BRANCH }}
+  GIT_REPOSITORY_URI: ${{ secrets.GIT_REPOSITORY_URI }}
 
 
 on:
