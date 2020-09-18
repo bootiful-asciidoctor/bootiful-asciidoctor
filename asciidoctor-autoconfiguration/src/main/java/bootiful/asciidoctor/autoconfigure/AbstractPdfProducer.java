@@ -9,6 +9,7 @@ import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 @Log4j2
 abstract class AbstractPdfProducer implements DocumentProducer {
@@ -50,6 +51,7 @@ abstract class AbstractPdfProducer implements DocumentProducer {
 	 * command {@code  gs} and the {@code rghost} gem installed to use it.
 	 */
 	@SneakyThrows
+	@Deprecated
 	protected File[] optimizeOutputPdf(File file) throws Exception {
 		var configuration = getPdfProducerConfiguration();
 		if (!configuration.isOptimize()) {
@@ -59,8 +61,10 @@ abstract class AbstractPdfProducer implements DocumentProducer {
 		// ok so the original file we get will be overwritten so we need to copy it and
 		// then use the copy to pass to the optimizer
 		var optimizedPdfFile = new File(file.getParentFile(), "index-" + configuration.getMedia() + "-optimized.pdf");
-		if (optimizedPdfFile.exists())
+		if (optimizedPdfFile.exists()) {
 			optimizedPdfFile.delete();
+		}
+
 		bootiful.asciidoctor.autoconfigure.FileCopyUtils.copy(file, optimizedPdfFile);
 
 		if (log.isDebugEnabled()) {
@@ -71,16 +75,18 @@ abstract class AbstractPdfProducer implements DocumentProducer {
 		var process = Runtime.getRuntime() //
 				.exec("asciidoctor-pdf-optimize "
 						+ file.getAbsolutePath() /*
-													 * + " --quality " + configuration.
+													 * todo make this work again +
+													 * " --quality " + configuration.
 													 * getPdfOptimizerQuality().name().
 													 * toLowerCase()
 													 */
 				);
 		var exitCode = process.waitFor();
-		log.debug("exit code: " + exitCode);
-		log.error("error: " + FileCopyUtils.copyToString(new InputStreamReader(process.getErrorStream())));
-		log.debug("input: " + FileCopyUtils.copyToString(new InputStreamReader(process.getInputStream())));
-
+		if (log.isDebugEnabled()) {
+			log.debug("exit code: " + exitCode);
+			log.error("error: " + FileCopyUtils.copyToString(new InputStreamReader(process.getErrorStream())));
+			log.debug("input: " + FileCopyUtils.copyToString(new InputStreamReader(process.getInputStream())));
+		}
 		return new File[] { file, optimizedPdfFile };
 	}
 
@@ -90,14 +96,24 @@ abstract class AbstractPdfProducer implements DocumentProducer {
 	 */
 	protected abstract PdfProducerConfiguration getPdfProducerConfiguration();
 
-	// protected abstract String getMedia();
-
 	@Override
-	public File[] produce() throws Exception {
+	public File[] produce() {
+		var optimize = this.getPdfProducerConfiguration().isOptimize();
+		var media = this.getPdfProducerConfiguration().getMedia();
+		var files = new ArrayList<File>();
+		files.add(this.producePdf(media, new File(this.properties.getRoot(), "index-" + media.toLowerCase() + ".pdf"),
+				false));
+		if (optimize) {
+			files.add(this.producePdf(media,
+					new File(this.properties.getRoot(), "index-optimized-" + media.toLowerCase() + ".pdf"), true));
+		}
+		return files.toArray(new File[0]);
+	}
+
+	private File producePdf(String media, File file, boolean optimize) {
 		var bookName = this.properties.getBookName();
 		var indexAdoc = getIndexAdoc(this.properties.getRoot());
 		var pdf = this.properties.getPdf();
-		var media = getPdfProducerConfiguration().getMedia();
 		var attributesBuilder = this.buildCommonAttributes(bookName, pdf.getIsbn(), indexAdoc)
 				.attribute("idseparator", "-") //
 				.imagesDir("images") //
@@ -113,12 +129,14 @@ abstract class AbstractPdfProducer implements DocumentProducer {
 				.attribute("notitle")//
 				.attribute("pdf-stylesdir", pdf.getStyles().getAbsolutePath()) //
 				.attribute("pdf-fontsdir", pdf.getFonts().getAbsolutePath());
+		if (optimize) {
+			attributesBuilder.attribute("compress");
+		}
 
-		var file = new File(this.properties.getRoot(), "index-" + media.toLowerCase() + ".pdf");
 		var optionsBuilder = this.buildCommonOptions("pdf", attributesBuilder).docType("book").toFile(file);
 		asciidoctor.convertFile(this.getIndexAdoc(this.properties.getRoot()), optionsBuilder);
 		log.info("inside " + this.getClass().getName() + " & just created " + file.getAbsolutePath() + '.');
-		return this.optimizeOutputPdf(file);
+		return file;
 	}
 
 }

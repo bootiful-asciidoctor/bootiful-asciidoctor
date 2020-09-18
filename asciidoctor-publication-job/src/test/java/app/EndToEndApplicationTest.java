@@ -3,7 +3,9 @@ package app;
 import bootiful.asciidoctor.PipelineJobProperties;
 import bootiful.asciidoctor.autoconfigure.DocumentProducer;
 import lombok.extern.log4j.Log4j2;
+import org.eclipse.jgit.api.Git;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,12 @@ public class EndToEndApplicationTest {
 
 	@Autowired
 	private ObjectProvider<DocumentProducer> producers;
+
+	@Before
+	public void before() throws Exception {
+		// todo sweep throught he configured Amazon S3 bucket and delete everything to
+		// periodically purge old files
+	}
 
 	@Test
 	public void runAppEndToEnd() {
