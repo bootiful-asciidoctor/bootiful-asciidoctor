@@ -12,6 +12,7 @@
     <groupId>bootiful.asciidoctor</groupId>
     <packaging>pom</packaging>
     <artifactId>parent</artifactId>
+    <name>bootiful-asciidoctor</name>
     <version>0.0.2-SNAPSHOT</version>
     <properties>
         <aws-java-sdk.version>1.11.567</aws-java-sdk.version>
