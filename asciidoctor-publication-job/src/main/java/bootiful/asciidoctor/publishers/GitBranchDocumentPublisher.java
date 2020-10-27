@@ -60,8 +60,9 @@ class GitBranchDocumentPublisher implements DocumentPublisher {
 		Assert.state(file.exists(), () -> "the directory " + file.getAbsolutePath() + " does not exist.");
 
 		var git = gitCloneCallback.clone(this.repository, file);
-		git.checkout().setName(this.branch).setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
-				.setStartPoint("origin/" + this.branch).call();
+		git.checkout().setCreateBranch(true).setName(this.branch)
+				.setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK).setStartPoint("origin/" + this.branch)
+				.call();
 
 		Assert.state(file.exists(), () -> "there should exist a cloned directory");
 		Assert.state(file.length() > 0, () -> "there should be more than one file (a .git directory if nothing else!)");
