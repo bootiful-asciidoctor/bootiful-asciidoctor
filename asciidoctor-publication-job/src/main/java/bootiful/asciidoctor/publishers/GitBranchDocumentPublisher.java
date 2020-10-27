@@ -3,17 +3,16 @@ package bootiful.asciidoctor.publishers;
 import bootiful.asciidoctor.DocumentPublisher;
 import bootiful.asciidoctor.autoconfigure.FileCopyUtils;
 import bootiful.asciidoctor.files.FileUtils;
+import bootiful.asciidoctor.git.GitCloneCallback;
 import bootiful.asciidoctor.git.GitPushCallback;
 import lombok.extern.log4j.Log4j2;
 import org.eclipse.jgit.api.CreateBranchCommand;
-import org.eclipse.jgit.api.Git;
 import org.springframework.util.Assert;
 
 import java.io.File;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,10 +28,14 @@ class GitBranchDocumentPublisher implements DocumentPublisher {
 
 	private final GitPushCallback gitPushCallback;
 
-	GitBranchDocumentPublisher(URI repository, String branch, GitPushCallback creator) {
+	private final GitCloneCallback gitCloneCallback;
+
+	GitBranchDocumentPublisher(URI repository, String branch, GitPushCallback creator,
+			GitCloneCallback gitCloneCallback) {
 		this.repository = repository;
 		this.branch = branch;
 		this.gitPushCallback = creator;
+		this.gitCloneCallback = gitCloneCallback;
 	}
 
 	private void delete(File file) {
@@ -51,11 +54,10 @@ class GitBranchDocumentPublisher implements DocumentPublisher {
 		log.debug("cloning remote repository {} to local directory {}  ", this.repository.toString(),
 				file.getAbsolutePath());
 		Assert.state(file.exists(), () -> "the directory " + file.getAbsolutePath() + " does not exist.");
-		var git = Git.cloneRepository().setURI(this.repository.toASCIIString()).setBranchesToClone(List.of(this.branch))
-				.setDirectory(file).call();
-		git.checkout().setCreateBranch(true).setName(this.branch)
-				.setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK).setStartPoint("origin/" + this.branch)
-				.call();
+		var git = gitCloneCallback.clone(this.repository, file);
+
+		git.checkout().setName(this.branch).setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
+				.setStartPoint("origin/" + this.branch).call();
 		Assert.state(file.exists(), () -> "there should exist a cloned directory");
 		Assert.state(file.length() > 0, () -> "there should be more than one file (a .git directory if nothing else!)");
 		for (var entry : files.entrySet()) {

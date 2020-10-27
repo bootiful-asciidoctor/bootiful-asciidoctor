@@ -14,8 +14,8 @@ public class TransportConfigCallbackGitCloneCallback implements GitCloneCallback
 	private final TransportConfigCallback configCallback;
 
 	@Override
-	public void clone(URI uri, File dir) throws GitAPIException {
-		Git.cloneRepository()//
+	public Git clone(URI uri, File dir) throws GitAPIException {
+		return Git.cloneRepository()//
 				.setTransportConfigCallback(configCallback)//
 				.setURI(uri.toASCIIString()) //
 				.setDirectory(dir).call();

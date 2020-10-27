@@ -28,7 +28,8 @@ class GitBranchDocumentPublisherTest {
 		var repository = URI.create(repositoryUri);
 		var httpAuth = new CredentialsProviderGitPushCallback(
 				new UsernamePasswordCredentialsProvider(gitHttpUsername, gitHttpPassword));
-		var dp = new GitBranchDocumentPublisher(repository, artifactBranch, httpAuth);
+		// TODO: FIXME
+		var dp = new GitBranchDocumentPublisher(repository, artifactBranch, httpAuth, null);
 		var epub = fileFromClassPathPath("files/epub/index.epub");
 		var html = fileFromClassPathPath("files/html/index.html");
 		var map = Map.of("epub", (Collection<File>) List.of(epub), "html", (Collection<File>) List.of(html));

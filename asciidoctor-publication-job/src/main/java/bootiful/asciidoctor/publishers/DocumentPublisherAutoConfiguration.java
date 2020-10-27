@@ -1,5 +1,6 @@
 package bootiful.asciidoctor.publishers;
 
+import bootiful.asciidoctor.git.GitCloneCallback;
 import bootiful.asciidoctor.git.GitPushCallback;
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -34,10 +35,11 @@ class DocumentPublisherAutoConfiguration {
 
 	@Bean
 	@ConditionalOnProperty(value = "pipeline.job.publishers.git.enabled", havingValue = "true")
-	GitBranchDocumentPublisher gitBranchDocumentPublisher(GitPushCallback gitPushCallback) {
+	GitBranchDocumentPublisher gitBranchDocumentPublisher(GitPushCallback gitPushCallback,
+			GitCloneCallback gitCloneCallback) {
 		var repo = this.properties.getGit().getRepository();
 		var branch = this.properties.getGit().getArtifactBranch();
-		return new GitBranchDocumentPublisher(repo, branch, gitPushCallback);
+		return new GitBranchDocumentPublisher(repo, branch, gitPushCallback, gitCloneCallback);
 	}
 
 	@Configuration

@@ -14,8 +14,8 @@ public class CredentialsProviderGitCloneCallback implements GitCloneCallback {
 	private final CredentialsProvider credentialsProvider;
 
 	@Override
-	public void clone(URI uri, File dir) throws GitAPIException {
-		Git.cloneRepository()//
+	public Git clone(URI uri, File dir) throws GitAPIException {
+		return Git.cloneRepository()//
 				.setCredentialsProvider(this.credentialsProvider)//
 				.setURI(uri.toASCIIString()) //
 				.setDirectory(dir).call();
