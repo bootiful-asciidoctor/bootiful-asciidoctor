@@ -1,5 +1,6 @@
 package bootiful.asciidoctor.publishers;
 
+import bootiful.asciidoctor.git.CredentialsProviderGitCloneCallback;
 import bootiful.asciidoctor.git.CredentialsProviderGitPushCallback;
 import lombok.SneakyThrows;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
@@ -26,10 +27,10 @@ class GitBranchDocumentPublisherTest {
 		var gitHttpUsername = System.getenv("GIT_USERNAME"); // this could be your github
 		var gitHttpPassword = System.getenv("GIT_PASSWORD"); // this could be your github
 		var repository = URI.create(repositoryUri);
-		var httpAuth = new CredentialsProviderGitPushCallback(
-				new UsernamePasswordCredentialsProvider(gitHttpUsername, gitHttpPassword));
-		// TODO: FIXME
-		var dp = new GitBranchDocumentPublisher(repository, artifactBranch, httpAuth, null);
+		var credentialsProvider = new UsernamePasswordCredentialsProvider(gitHttpUsername, gitHttpPassword);
+		var httpAuthGitClone = new CredentialsProviderGitCloneCallback(credentialsProvider);
+		var httpAuthGitPush = new CredentialsProviderGitPushCallback(credentialsProvider);
+		var dp = new GitBranchDocumentPublisher(repository, artifactBranch, httpAuthGitPush, httpAuthGitClone);
 		var epub = fileFromClassPathPath("files/epub/index.epub");
 		var html = fileFromClassPathPath("files/html/index.html");
 		var map = Map.of("epub", (Collection<File>) List.of(epub), "html", (Collection<File>) List.of(html));

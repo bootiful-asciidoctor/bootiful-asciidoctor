@@ -18,6 +18,9 @@ import java.util.Map;
 /**
  * this {@link DocumentPublisher} clones a git repository, checks out a configured branch,
  * and then checks in the archive of the produced files.
+ *
+ * @author Josh Long
+ *
  */
 @Log4j2
 class GitBranchDocumentPublisher implements DocumentPublisher {
@@ -54,10 +57,11 @@ class GitBranchDocumentPublisher implements DocumentPublisher {
 		log.debug("cloning remote repository {} to local directory {}  ", this.repository.toString(),
 				file.getAbsolutePath());
 		Assert.state(file.exists(), () -> "the directory " + file.getAbsolutePath() + " does not exist.");
-		var git = gitCloneCallback.clone(this.repository, file);
 
+		var git = gitCloneCallback.clone(this.repository, file);
 		git.checkout().setName(this.branch).setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
 				.setStartPoint("origin/" + this.branch).call();
+
 		Assert.state(file.exists(), () -> "there should exist a cloned directory");
 		Assert.state(file.length() > 0, () -> "there should be more than one file (a .git directory if nothing else!)");
 		for (var entry : files.entrySet()) {
