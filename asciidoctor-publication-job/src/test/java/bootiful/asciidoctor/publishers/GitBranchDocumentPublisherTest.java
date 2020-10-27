@@ -13,6 +13,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Josh Long
+ * @author Trisha Gee
+ */
 class GitBranchDocumentPublisherTest {
 
 	@SneakyThrows
@@ -24,8 +28,8 @@ class GitBranchDocumentPublisherTest {
 	void publishToGitRepository() throws Exception {
 		var repositoryUri = System.getenv("GIT_REPOSITORY_URI");
 		var artifactBranch = System.getenv("GIT_ARTIFACT_BRANCH");
-		var gitHttpUsername = System.getenv("GIT_USERNAME"); // this could be your github
-		var gitHttpPassword = System.getenv("GIT_PASSWORD"); // this could be your github
+		var gitHttpUsername = System.getenv("GIT_USERNAME");
+		var gitHttpPassword = System.getenv("GIT_PASSWORD");
 		var repository = URI.create(repositoryUri);
 		var credentialsProvider = new UsernamePasswordCredentialsProvider(gitHttpUsername, gitHttpPassword);
 		var httpAuthGitClone = new CredentialsProviderGitCloneCallback(credentialsProvider);

@@ -16,6 +16,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * @author Josh Long
+ * @author Trisha Gee
+ */
 @Configuration
 @RequiredArgsConstructor
 @EnableConfigurationProperties(PipelineJobPublishersProperties.class)

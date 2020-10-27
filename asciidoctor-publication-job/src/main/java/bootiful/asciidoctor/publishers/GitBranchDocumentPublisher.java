@@ -20,6 +20,7 @@ import java.util.Map;
  * and then checks in the archive of the produced files.
  *
  * @author Josh Long
+ * @author Trisha Gee
  *
  */
 @Log4j2
