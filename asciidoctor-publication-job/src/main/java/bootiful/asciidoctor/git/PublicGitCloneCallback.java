@@ -9,8 +9,8 @@ import java.net.URI;
 public class PublicGitCloneCallback implements GitCloneCallback {
 
 	@Override
-	public void clone(URI uri, File dir) throws GitAPIException {
-		Git.cloneRepository().setURI(uri.toASCIIString()).setDirectory(dir).call();
+	public Git clone(URI uri, File dir) throws GitAPIException {
+		return Git.cloneRepository().setURI(uri.toASCIIString()).setDirectory(dir).call();
 	}
 
 }
