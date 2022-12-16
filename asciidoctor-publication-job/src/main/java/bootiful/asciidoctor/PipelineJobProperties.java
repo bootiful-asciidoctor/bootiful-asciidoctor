@@ -1,7 +1,7 @@
 package bootiful.asciidoctor;
 
 import jakarta.annotation.PostConstruct;
-import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.Assert;
 
@@ -12,28 +12,14 @@ import java.io.File;
  * root directory. The goal here is to get all the requisite directories into the right
  * place for the Asdiidoctor pipeline
  */
-@Data
+@Slf4j
 @ConfigurationProperties("pipeline.job")
-public class PipelineJobProperties {
-
-	private boolean enabled = true;
-
-	private File root;
-
-	private String bookName; // an alias for `pipeline.book-name`
-
-	private int maxThreadsInThreadpool = Runtime.getRuntime().availableProcessors();
-
-	private String[] codeRepositories;
-
-	// @NonNull
-	private String documentRepository;
-
-	// @NonNull
-	private File target;
+public record PipelineJobProperties(boolean enabled, File root, String bookName, int maxThreadsInThreadpool,
+		String[] codeRepositories, String documentRepository, File target) {
 
 	@PostConstruct
 	public void validate() {
+		log.info("validating " + this.getClass().getName());
 		if (!this.target.exists()) {
 			this.target.mkdirs();
 		}

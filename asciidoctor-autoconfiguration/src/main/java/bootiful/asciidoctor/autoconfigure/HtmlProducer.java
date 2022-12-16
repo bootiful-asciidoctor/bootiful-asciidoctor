@@ -16,9 +16,9 @@ class HtmlProducer implements DocumentProducer {
 
 	@Override
 	public File[] produce() {
-		var builder = this.buildCommonAttributes(this.properties.getBookName(), "(No ISBN required)",
-				this.properties.getCode());
-		var index = this.getIndexAdoc(this.properties.getRoot());
+		var builder = this.buildCommonAttributes(this.properties.bookName(), "(No ISBN required)",
+				this.properties.code());
+		var index = this.getIndexAdoc(this.properties.root());
 		var rootTarget = index.getParentFile();
 		if (!rootTarget.exists())
 			rootTarget.mkdirs();

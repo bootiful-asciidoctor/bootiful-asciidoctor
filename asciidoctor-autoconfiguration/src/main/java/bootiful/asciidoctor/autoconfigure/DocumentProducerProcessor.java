@@ -28,12 +28,11 @@ class DocumentProducerProcessor {
 		log.info("there are " + this.producers.length + " " + DocumentProducer.class.getName() + " instances");
 		Stream.of(this.producers).forEach(producer -> {
 			try {
-				var name = producer.getClass().getName();
-				log.info("Running " + name + ".");
 				var filesArray = producer.produce();
-				var fileStream = Stream.of(filesArray);
-				Assert.isTrue(filesArray.length > 0, "The " + name + " didn't produce any artifacts!");
-				this.collectOutputFiles(producer, fileStream);
+				if (filesArray.length > 0) {
+					var fileStream = Stream.of(filesArray);
+					this.collectOutputFiles(producer, fileStream);
+				}
 			}
 			catch (Exception e) {
 				log.error("had trouble running " + producer.getClass().getName()
@@ -44,7 +43,7 @@ class DocumentProducerProcessor {
 
 	private void collectOutputFiles(DocumentProducer producer, Stream<File> files) {
 		var name = producer.getClass().getSimpleName().toLowerCase().replace("producer", "");
-		var target = new File(this.properties.getTarget(), name);
+		var target = new File(this.properties.target(), name);
 		Assert.isTrue(target.exists() || target.mkdirs(),
 				"the target directory " + target.getAbsolutePath() + " does not exist and couldn't be created");
 		files.forEach(inputFile -> doCopy(inputFile, new File(target, inputFile.getName())));

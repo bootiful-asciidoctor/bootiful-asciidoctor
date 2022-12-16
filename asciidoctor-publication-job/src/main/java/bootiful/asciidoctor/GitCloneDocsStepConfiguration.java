@@ -40,13 +40,12 @@ class GitCloneDocsStepConfiguration {
 	Step gitCloneDocsStep() {
 		return new StepBuilder("clone-docs-step", jr) //
 				.tasklet((stepContribution, chunkContext) -> {
-					var docs = FileUtils.getDocsDirectory(pipelineJobProperties.getRoot());
+					log.info("going to clone");
+					var docs = FileUtils.getDocsDirectory(pipelineJobProperties.root());
 					FileUtils.resetOrRecreateDirectory(docs);
-					var docsUri = URI.create(pipelineJobProperties.getDocumentRepository().trim());
+					var docsUri = URI.create(pipelineJobProperties.documentRepository().trim());
 					cloneCallback.clone(docsUri, docs);
-					if (log.isDebugEnabled()) {
-						log.debug("cloned " + docsUri.toString() + " to " + docs.getAbsolutePath() + '.');
-					}
+					log.info("cloned " + docsUri + " to " + docs.getAbsolutePath() + '.');
 					return RepeatStatus.FINISHED;
 				}, this.ptx) //
 				.build();

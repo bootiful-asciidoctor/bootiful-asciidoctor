@@ -47,11 +47,14 @@ class JobConfiguration {
 	Flow splitFlow(@DocumentProducerFlow Flow[] flowList) {
 		Collection<Flow> values = Arrays.asList(flowList);
 		Flow[] flows = values.toArray(new Flow[0]);
-		return new FlowBuilder<Flow>(SPLIT_FLOW_ID).split(this.executor).add(flows).build();
+		return new FlowBuilder<Flow>(SPLIT_FLOW_ID).split(this.executor) ///
+				.add(flows) ///
+				.build();
 	}
 
 	@Bean
 	Job job(@Qualifier(SPLIT_FLOW_ID) Flow flow) {
+		log.info("building the job");
 		return new JobBuilder("asciidoctor-publication-job", this.jobRepository)//
 				.incrementer(new RunIdIncrementer()) //
 				.start(this.gitCloneDocsStepConfiguration.gitCloneDocsFlow()) //

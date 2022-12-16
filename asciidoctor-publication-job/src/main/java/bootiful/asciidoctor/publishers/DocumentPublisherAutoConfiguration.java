@@ -27,16 +27,6 @@ class DocumentPublisherAutoConfiguration {
 
 	private final PipelineJobPublishersProperties properties;
 
-	// // @Bean
-	// GithubReleaseDocumentPublisher githubReleaseDocumentPublisher() {
-	// return new GithubReleaseDocumentPublisher();
-	// }
-	//
-	// // @Bean
-	// SendgridEmailDocumentPublisher sendgridEmailDocumentPublisher() {
-	// return new SendgridEmailDocumentPublisher();
-	// }
-
 	@Bean
 	@ConditionalOnProperty(value = "pipeline.job.publishers.git.enabled", havingValue = "true")
 	GitBranchDocumentPublisher gitBranchDocumentPublisher(GitPushCallback gitPushCallback,

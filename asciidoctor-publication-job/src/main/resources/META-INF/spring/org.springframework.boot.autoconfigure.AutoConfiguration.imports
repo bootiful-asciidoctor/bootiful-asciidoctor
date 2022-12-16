@@ -1,0 +1,3 @@
+bootiful.asciidoctor.publishers.DocumentPublisherAutoConfiguration
+bootiful.asciidoctor.AsciidoctorPublicationJobAutoConfiguration
+bootiful.asciidoctor.git.GitAutoConfiguration

@@ -46,10 +46,10 @@ class DocumentProducerStepConfiguration {
 	// with references to the other beans
 	private static Flow buildFlow(BeanFactory beans, String beanName) {
 		var props = beans.getBean(PipelineJobProperties.class);
-		var documentProducer = beans.getBean(DocumentProducer.class);
+		var documentProducer = beans.getBean(beanName, DocumentProducer.class);
 		var jr = beans.getBean(JobRepository.class);
 		var platformTransactionManager = beans.getBean(PlatformTransactionManager.class);
-		var dpt = new DocumentProducerTasklet(documentProducer, props.getTarget());
+		var dpt = new DocumentProducerTasklet(documentProducer, props.target());
 		return new FlowBuilder<Flow>(beanName + "Flow")//
 				.start(new StepBuilder(beanName + DocumentProducer.class.getSimpleName() + "Step", jr)//
 						.tasklet(dpt, platformTransactionManager) //

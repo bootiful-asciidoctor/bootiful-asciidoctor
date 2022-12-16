@@ -37,15 +37,11 @@ import java.util.stream.Stream;
 @Configuration
 class GitCloneCodeStepConfiguration {
 
-	private final StepBuilder stepBuilder;
-
 	private final TaskExecutor executor;
 
 	private final File root;
 
 	private final Function<URI, File> cloneFunction;
-
-	private final PipelineJobProperties pipelineJobProperties;
 
 	private final Collection<URI> repositories;
 
@@ -53,19 +49,16 @@ class GitCloneCodeStepConfiguration {
 
 	private final PlatformTransactionManager ptm;
 
-	GitCloneCodeStepConfiguration(PipelineJobProperties pipelineJobProperties, StepBuilder stepBuilder,
-			TaskExecutor executor, JobRepository jobRepository, PlatformTransactionManager ptm) {
-		this.pipelineJobProperties = pipelineJobProperties;
-		this.stepBuilder = stepBuilder;
+	GitCloneCodeStepConfiguration(PipelineJobProperties pipelineJobProperties, TaskExecutor executor,
+			JobRepository jobRepository, PlatformTransactionManager ptm) {
 		this.ptm = ptm;
 		this.executor = executor;
-		// this.maxConcurrency = pipelineJobProperties.getMaxThreadsInThreadpool();
-		this.root = pipelineJobProperties.getRoot();
+		this.root = pipelineJobProperties.root();
 		this.jobRepository = jobRepository;
 		this.cloneFunction = uri -> buildLocalCodeDirectoryFromGitUri(this.root, uri);
 		FileUtils.resetOrRecreateDirectory(this.root);
 		this.repositories = Stream //
-				.of(this.pipelineJobProperties.getCodeRepositories()) //
+				.of(pipelineJobProperties.codeRepositories()) //
 				.map(String::trim) //
 				.map(URI::create)//
 				.collect(Collectors.toCollection(ConcurrentSkipListSet::new));
@@ -97,7 +90,6 @@ class GitCloneCodeStepConfiguration {
 				.<URI, URI>chunk(1, this.ptm)//
 				.reader(reader())//
 				.writer(writer())//
-				// .throttleLimit(this.maxConcurrency)//
 				.taskExecutor(this.executor)//
 				.build();
 	}
@@ -111,9 +103,8 @@ class GitCloneCodeStepConfiguration {
 
 	@SneakyThrows
 	private Git createLocalGitRepositoryFor(URI uri) {
-		log.info("going to clone " + uri.toString());
 		var newCloneDirectory = this.cloneFunction.apply(uri);
-		log.info("the output directory will be " + newCloneDirectory.getAbsolutePath() + '.');
+		log.info("going to clone " + uri.toString() + " to " + newCloneDirectory.getAbsolutePath());
 		FileUtils.resetOrRecreateDirectory(newCloneDirectory);
 		return GitUtils.createLocalHttpGitRepository(uri, newCloneDirectory);
 	}
