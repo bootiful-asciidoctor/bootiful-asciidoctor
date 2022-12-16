@@ -41,6 +41,9 @@ class DocumentProducerTasklet implements Tasklet {
 
 	@SuppressWarnings("unchecked")
 	private void contributeFilesToOutput(ChunkContext context, File[] fileArray) {
+		if (fileArray.length == 0)
+			return;
+
 		var executionContext = context.getStepContext() //
 				.getStepExecution() //
 				.getJobExecution()//
