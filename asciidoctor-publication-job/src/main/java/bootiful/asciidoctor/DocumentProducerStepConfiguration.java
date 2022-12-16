@@ -2,46 +2,57 @@ package bootiful.asciidoctor;
 
 import bootiful.asciidoctor.autoconfigure.DocumentProducer;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.flow.Flow;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.support.AutowireCandidateQualifier;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.PlatformTransactionManager;
 
-@Log4j2
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 class DocumentProducerStepConfiguration {
 
+	// todo this will probably need to be revisited in the light of the AOT engine.
+	// could i use a
 	@Bean
 	static BeanFactoryPostProcessor flowRegisteringBeanFactoryPostProcessor() {
 		return beans -> {
-			var listableBeanFactory = (DefaultListableBeanFactory) beans;
-			var beanNamesForType = beans.getBeanNamesForType(DocumentProducer.class);
-			for (var beanName : beanNamesForType) {
-				var beanDefinition = BeanDefinitionBuilder
-						.genericBeanDefinition(Flow.class, () -> buildFlow(listableBeanFactory, beanName))
-						.getBeanDefinition();
-				beanDefinition.addQualifier(new AutowireCandidateQualifier(DocumentProducerFlow.class));
-				listableBeanFactory.registerBeanDefinition(beanName + "FlowRegistration", beanDefinition);
+			if (beans instanceof BeanDefinitionRegistry bdr) {
+				var beanNamesForType = beans.getBeanNamesForType(DocumentProducer.class);
+				for (var beanName : beanNamesForType) {
+					var beanDefinition = BeanDefinitionBuilder
+							.genericBeanDefinition(Flow.class, () -> buildFlow(beans, beanName)).getBeanDefinition();
+					beanDefinition.addQualifier(new AutowireCandidateQualifier(DocumentProducerFlow.class));
+					bdr.registerBeanDefinition(beanName + "FlowRegistration", beanDefinition);
+				}
+			} //
+			else {
+				log.error("the BeanFactory is not an instance of " + BeanDefinitionRegistry.class.getName() + ". This "
+						+ BeanFactoryPostProcessor.class.getName() + " can not be used.");
 			}
 		};
 	}
 
-	private static Flow buildFlow(DefaultListableBeanFactory listableBeanFactory, String beanName) {
-		var sbf = listableBeanFactory.getBean(StepBuilderFactory.class);
-		var props = listableBeanFactory.getBean(PipelineJobProperties.class);
-		var documentProducer = listableBeanFactory.getBean(beanName, DocumentProducer.class);
+	// this method is called in the supplier for the object, which is why its ok to work
+	// with references to the other beans
+	private static Flow buildFlow(BeanFactory beans, String beanName) {
+		var props = beans.getBean(PipelineJobProperties.class);
+		var documentProducer = beans.getBean(DocumentProducer.class);
+		var jr = beans.getBean(JobRepository.class);
+		var platformTransactionManager = beans.getBean(PlatformTransactionManager.class);
 		var dpt = new DocumentProducerTasklet(documentProducer, props.getTarget());
 		return new FlowBuilder<Flow>(beanName + "Flow")//
-				.start(sbf //
-						.get(beanName + DocumentProducer.class.getSimpleName() + "Step")//
-						.tasklet(dpt) //
+				.start(new StepBuilder(beanName + DocumentProducer.class.getSimpleName() + "Step", jr)//
+						.tasklet(dpt, platformTransactionManager) //
 						.build() //
 				) //
 				.build();

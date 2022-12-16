@@ -3,17 +3,19 @@ package bootiful.asciidoctor;
 import bootiful.asciidoctor.files.FileUtils;
 import com.joshlong.git.GitUtils;
 import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.api.Git;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.flow.Flow;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import java.io.File;
 import java.net.URI;
@@ -31,11 +33,11 @@ import java.util.stream.Stream;
  * so that there's special handling for the docs repository which needs to be under a
  * well-known folder
  */
-@Log4j2
+@Slf4j
 @Configuration
 class GitCloneCodeStepConfiguration {
 
-	private final StepBuilderFactory stepBuilderFactory;
+	private final StepBuilder stepBuilder;
 
 	private final TaskExecutor executor;
 
@@ -43,19 +45,23 @@ class GitCloneCodeStepConfiguration {
 
 	private final Function<URI, File> cloneFunction;
 
-	private final int maxConcurrency;
-
 	private final PipelineJobProperties pipelineJobProperties;
 
 	private final Collection<URI> repositories;
 
-	GitCloneCodeStepConfiguration(PipelineJobProperties pipelineJobProperties, StepBuilderFactory stepBuilderFactory,
-			TaskExecutor executor) {
+	private final JobRepository jobRepository;
+
+	private final PlatformTransactionManager ptm;
+
+	GitCloneCodeStepConfiguration(PipelineJobProperties pipelineJobProperties, StepBuilder stepBuilder,
+			TaskExecutor executor, JobRepository jobRepository, PlatformTransactionManager ptm) {
 		this.pipelineJobProperties = pipelineJobProperties;
-		this.stepBuilderFactory = stepBuilderFactory;
+		this.stepBuilder = stepBuilder;
+		this.ptm = ptm;
 		this.executor = executor;
-		this.maxConcurrency = pipelineJobProperties.getMaxThreadsInThreadpool();
+		// this.maxConcurrency = pipelineJobProperties.getMaxThreadsInThreadpool();
 		this.root = pipelineJobProperties.getRoot();
+		this.jobRepository = jobRepository;
 		this.cloneFunction = uri -> buildLocalCodeDirectoryFromGitUri(this.root, uri);
 		FileUtils.resetOrRecreateDirectory(this.root);
 		this.repositories = Stream //
@@ -87,12 +93,11 @@ class GitCloneCodeStepConfiguration {
 	@Bean
 	Step gitCloneCodeStep() {
 		// chunk size of 1 to ensure that we clone each repository on a separate thread.
-		return this.stepBuilderFactory //
-				.get("clone-git-repositories")//
-				.<URI, URI>chunk(1)//
+		return new StepBuilder("clone-git-repositories", this.jobRepository)//
+				.<URI, URI>chunk(1, this.ptm)//
 				.reader(reader())//
 				.writer(writer())//
-				.throttleLimit(this.maxConcurrency)//
+				// .throttleLimit(this.maxConcurrency)//
 				.taskExecutor(this.executor)//
 				.build();
 	}

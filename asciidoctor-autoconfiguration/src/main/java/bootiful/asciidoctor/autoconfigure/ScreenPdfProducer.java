@@ -12,7 +12,6 @@ class ScreenPdfProducer extends AbstractPdfProducer {
 		var mediaConfig = pdf.getScreen();
 		this.configuration = new PdfProducerConfiguration(mediaConfig.getQuality(), mediaConfig.isOptimize(),
 				mediaConfig.getMedia());
-
 	}
 
 	@Override

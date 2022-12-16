@@ -1,8 +1,8 @@
 package bootiful.asciidoctor.autoconfigure;
 
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.asciidoctor.Asciidoctor;
-import org.asciidoctor.internal.AsciidoctorCoreException;
+import org.asciidoctor.jruby.internal.AsciidoctorCoreException;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
@@ -16,7 +16,7 @@ import java.io.OutputStream;
  * variable - ${code KINDLEGEN} - where the ${code kindlegen} binary can be found. The
  * environment variable should point to the location of the `kindlegen` binary itself.
  */
-@Log4j2
+@Slf4j
 class MobiProducer implements DocumentProducer {
 
 	private final PublicationProperties properties;
@@ -33,16 +33,16 @@ class MobiProducer implements DocumentProducer {
 	}
 
 	@Override
-	public File[] produce() throws Exception {
+	public File[] produce() {
 
 		var indexAdoc = getIndexAdoc(this.properties.getRoot());
 		var bookName = this.properties.getBookName();
 		var attributesBuilder = this
 				.buildCommonAttributes(bookName, this.properties.getMobi().getIsbn(), this.properties.getCode())
 				.attribute("ebook-format", "kf8");
-		var optionsBuilder = this.buildCommonOptions("epub3", attributesBuilder);
+		var optionsBuilder = this.buildCommonOptions("epub3", attributesBuilder.build());
 		try {
-			asciidoctor.convertFile(indexAdoc, optionsBuilder);
+			asciidoctor.convertFile(indexAdoc, optionsBuilder.build());
 		}
 		catch (AsciidoctorCoreException ace) {
 			log.warn("Exception when producing the .mobi. The cause is " + ace.getMessage()
@@ -58,9 +58,8 @@ class MobiProducer implements DocumentProducer {
 	}
 
 	private void installKindlegen() throws Exception {
-
-		File binaryLocation = this.properties.getMobi().getKindlegen().getBinaryLocation();
-		File directoryForKindlegen = binaryLocation.getParentFile();
+		var binaryLocation = this.properties.getMobi().getKindlegen().getBinaryLocation();
+		var directoryForKindlegen = binaryLocation.getParentFile();
 		if (!directoryForKindlegen.exists()) {
 			directoryForKindlegen.mkdirs();
 		}
@@ -68,8 +67,8 @@ class MobiProducer implements DocumentProducer {
 				() -> "the directory " + directoryForKindlegen.getAbsolutePath() + " does not exist!");
 		Assert.state(binaryLocation.exists() && binaryLocation.isFile() || !binaryLocation.exists(), () -> "the path "
 				+ binaryLocation.getAbsolutePath() + " must not exist or it must be a (writable) file");
-		try (InputStream inputStream = this.kindlegenBinary.getInputStream();
-				OutputStream outputStream = new FileOutputStream(binaryLocation)) {
+		try (var inputStream = this.kindlegenBinary.getInputStream();
+				var outputStream = new FileOutputStream(binaryLocation)) {
 			FileCopyUtils.copy(inputStream, outputStream);
 		}
 		Assert.state(0 == Runtime.getRuntime().exec("chmod a+x " + binaryLocation.getAbsolutePath()).waitFor(),

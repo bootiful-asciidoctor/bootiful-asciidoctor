@@ -21,8 +21,8 @@ import java.util.concurrent.Executors;
 class AsciidoctorPublicationJobAutoConfiguration {
 
 	@Bean
-	TaskExecutor taskExecutor() {
-		Executor executor = Executors.newCachedThreadPool();
+	TaskExecutor taskExecutor(PipelineJobProperties properties) {
+		var executor = Executors.newFixedThreadPool(properties.getMaxThreadsInThreadpool());
 		return new ConcurrentTaskExecutor(executor);
 	}
 

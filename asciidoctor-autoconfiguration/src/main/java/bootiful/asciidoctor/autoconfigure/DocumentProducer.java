@@ -1,22 +1,17 @@
 package bootiful.asciidoctor.autoconfigure;
 
-import org.asciidoctor.AttributesBuilder;
-import org.asciidoctor.OptionsBuilder;
-import org.asciidoctor.SafeMode;
+import org.asciidoctor.*;
 
 import java.io.File;
-
-import static org.asciidoctor.AttributesBuilder.attributes;
-import static org.asciidoctor.OptionsBuilder.options;
 
 public interface DocumentProducer {
 
 	default OptionsBuilder buildCommonOptions(String backend) {
-		return options().safe(SafeMode.UNSAFE).backend(backend).inPlace(false);
+		return Options.builder().safe(SafeMode.UNSAFE).backend(backend).inPlace(false);
 	}
 
-	default OptionsBuilder buildCommonOptions(String backend, AttributesBuilder attributesBuilder) {
-		return this.buildCommonOptions(backend).attributes(attributesBuilder);
+	default OptionsBuilder buildCommonOptions(String backend, Attributes attributes) {
+		return this.buildCommonOptions(backend).attributes(attributes);
 	}
 
 	default File getIndexAdoc(File root) {
@@ -25,7 +20,7 @@ public interface DocumentProducer {
 
 	default AttributesBuilder buildCommonAttributes(String bookName, String isbn, File source) {
 
-		return attributes()//
+		return Attributes.builder()//
 				.title(bookName)//
 				.attribute("doctitle", bookName) //
 				.tableOfContents(true) //

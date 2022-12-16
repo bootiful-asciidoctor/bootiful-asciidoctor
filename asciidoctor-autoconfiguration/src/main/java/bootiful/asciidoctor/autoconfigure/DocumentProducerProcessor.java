@@ -1,8 +1,7 @@
 package bootiful.asciidoctor.autoconfigure;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-import org.asciidoctor.Asciidoctor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.util.Assert;
@@ -16,18 +15,16 @@ import static bootiful.asciidoctor.autoconfigure.FileCopyUtils.copy;
  * This is only run IF it's specifically enabled. The client of this API may run the
  * {@link DocumentProducer} instances as they please.
  */
-@Log4j2
+@Slf4j
 @RequiredArgsConstructor
 class DocumentProducerProcessor {
-
-	private final Asciidoctor asciidoctor;
 
 	private final DocumentProducer[] producers;
 
 	private final PublicationProperties properties;
 
 	@EventListener(ApplicationReadyEvent.class)
-	public void produceDocuments() throws Exception {
+	public void produceDocuments() {
 		log.info("there are " + this.producers.length + " " + DocumentProducer.class.getName() + " instances");
 		Stream.of(this.producers).forEach(producer -> {
 			try {

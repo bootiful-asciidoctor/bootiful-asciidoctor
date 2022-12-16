@@ -7,6 +7,7 @@ import org.springframework.util.Assert;
 
 import java.io.File;
 
+// todo convert all of these into records
 @Data
 @ConfigurationProperties("publication")
 public class PublicationProperties {
@@ -51,11 +52,6 @@ public class PublicationProperties {
 		private String isbn;
 
 		private File fonts, styles;
-
-		// private Pdf.PdfMedia media = Pdf.PdfMedia.SCREEN;
-		// public enum PdfMedia {
-		// PREPRESS, SCREEN
-		// }
 
 		private Prepress prepress = new Prepress();
 
@@ -114,8 +110,8 @@ public class PublicationProperties {
 			private File binaryLocation;
 
 			Kindlegen() {
-				String kindleGenEnvVariableName = "KINDLEGEN";
-				String kindleGenEnvVariableValue = System.getenv(kindleGenEnvVariableName);
+				var kindleGenEnvVariableName = "KINDLEGEN";
+				var kindleGenEnvVariableValue = System.getenv(kindleGenEnvVariableName);
 				Assert.hasText(kindleGenEnvVariableValue, "$" + kindleGenEnvVariableName + " must not be null");
 				this.binaryLocation = new File(kindleGenEnvVariableValue);
 			}

@@ -1,11 +1,12 @@
 package bootiful.asciidoctor;
 
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.job.builder.FlowBuilder;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +15,7 @@ import org.springframework.core.task.TaskExecutor;
 import java.util.Arrays;
 import java.util.Collection;
 
-@Log4j2
+@Slf4j
 @Configuration
 class JobConfiguration {
 
@@ -26,19 +27,19 @@ class JobConfiguration {
 
 	private final DocumentPublisherStepConfiguration documentPublisherStepConfiguration;
 
-	private final JobBuilderFactory jobBuilderFactory;
-
 	private final TaskExecutor executor;
+
+	private final JobRepository jobRepository;
 
 	JobConfiguration(GitCloneCodeStepConfiguration gitCloneCodeStepConfiguration,
 			GitCloneDocsStepConfiguration gitCloneDocsStepConfiguration,
-			DocumentPublisherStepConfiguration documentPublisherStepConfiguration, JobBuilderFactory jobBuilderFactory,
-			TaskExecutor executor) {
+			DocumentPublisherStepConfiguration documentPublisherStepConfiguration, TaskExecutor executor,
+			JobRepository jr) {
 		this.gitCloneDocsStepConfiguration = gitCloneDocsStepConfiguration;
 		this.gitCloneCodeStepConfiguration = gitCloneCodeStepConfiguration;
-		this.jobBuilderFactory = jobBuilderFactory;
 		this.documentPublisherStepConfiguration = documentPublisherStepConfiguration;
 		this.executor = executor;
+		this.jobRepository = jr;
 	}
 
 	@Bean
@@ -51,8 +52,7 @@ class JobConfiguration {
 
 	@Bean
 	Job job(@Qualifier(SPLIT_FLOW_ID) Flow flow) {
-		return this.jobBuilderFactory//
-				.get("asciidoctor-publication-job")//
+		return new JobBuilder("asciidoctor-publication-job", this.jobRepository)//
 				.incrementer(new RunIdIncrementer()) //
 				.start(this.gitCloneDocsStepConfiguration.gitCloneDocsFlow()) //
 				.next(this.gitCloneCodeStepConfiguration.gitCloneCodeFlow()) //

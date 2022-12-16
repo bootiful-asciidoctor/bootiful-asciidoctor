@@ -1,10 +1,10 @@
 package bootiful.asciidoctor;
 
+import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.Assert;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 
 /**

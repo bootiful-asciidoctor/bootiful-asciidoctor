@@ -1,7 +1,7 @@
 package bootiful.asciidoctor;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
-@Log4j2
+@Slf4j
 @RequiredArgsConstructor
 class DocumentPublisherTasklet implements ApplicationEventPublisherAware, Tasklet {
 
@@ -24,8 +24,8 @@ class DocumentPublisherTasklet implements ApplicationEventPublisherAware, Taskle
 	private final AtomicReference<ApplicationEventPublisher> applicationEventPublisher = new AtomicReference<>();
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public RepeatStatus execute(StepContribution contribution, ChunkContext context) throws Exception {
-
 		var executionContext = context.getStepContext().getStepExecution().getJobExecution().getExecutionContext();
 		var files = Objects.requireNonNull((Map<String, Collection<File>>) executionContext.get("files"));
 		var msg = "using " + DocumentPublisher.class.getSimpleName() + " instance "

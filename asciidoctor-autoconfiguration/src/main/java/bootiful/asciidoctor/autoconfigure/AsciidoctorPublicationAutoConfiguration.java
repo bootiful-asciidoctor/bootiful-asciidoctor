@@ -1,6 +1,6 @@
 package bootiful.asciidoctor.autoconfigure;
 
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.asciidoctor.Asciidoctor;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,8 +13,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.io.Resource;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
-@Log4j2
-@Configuration(proxyBeanMethods = false)
+@Slf4j
+@Configuration
 @EnableConfigurationProperties(PublicationProperties.class)
 @ConditionalOnClass(Asciidoctor.class)
 class AsciidoctorPublicationAutoConfiguration {
@@ -30,7 +30,7 @@ class AsciidoctorPublicationAutoConfiguration {
 	 */
 	@Bean
 	@Conditional(LinuxCondition.class)
-	@ConditionalOnProperty(name = "publication.mobi.enabled", havingValue = "true", matchIfMissing = false)
+	@ConditionalOnProperty(name = "publication.mobi.enabled", havingValue = "true")
 	MobiProducer mobiProducer(PublicationProperties pp, @Value("classpath:/kindlegen") Resource kindlegen,
 			Asciidoctor asciidoctor) throws Exception {
 		return new MobiProducer(pp, asciidoctor, kindlegen);
@@ -49,11 +49,11 @@ class AsciidoctorPublicationAutoConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnProperty(name = "publication.runner.enabled", havingValue = "true", matchIfMissing = false)
-	DocumentProducerProcessor documentProducerProcessor(Asciidoctor ad, ObjectProvider<DocumentProducer> dps,
+	@ConditionalOnProperty(name = "publication.runner.enabled", havingValue = "true")
+	DocumentProducerProcessor documentProducerProcessor(ObjectProvider<DocumentProducer> dps,
 			PublicationProperties pp) {
 		var array = dps.stream().toArray(DocumentProducer[]::new);
-		return new DocumentProducerProcessor(ad, array, pp);
+		return new DocumentProducerProcessor(array, pp);
 	}
 
 	@Bean

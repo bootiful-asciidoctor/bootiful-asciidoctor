@@ -2,13 +2,13 @@ package bootiful.asciidoctor.autoconfigure;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.asciidoctor.Asciidoctor;
 
 import java.io.File;
 import java.util.ArrayList;
 
-@Log4j2
+@Slf4j
 abstract class AbstractPdfProducer implements DocumentProducer {
 
 	private final PublicationProperties properties;
@@ -79,12 +79,12 @@ abstract class AbstractPdfProducer implements DocumentProducer {
 
 		if (this.getPdfProducerConfiguration().isOptimize()) {
 			PdfOptimizerQuality pdfOptimizerQuality = this.getPdfProducerConfiguration().getPdfOptimizerQuality();
-			log.debug(() -> "optimize value = " + pdfOptimizerQuality.toString().toLowerCase());
+			log.debug("optimize value = " + pdfOptimizerQuality.toString().toLowerCase());
 			attributesBuilder.attribute("optimize", pdfOptimizerQuality.toString().toLowerCase());
 		}
 
-		var optionsBuilder = this.buildCommonOptions("pdf", attributesBuilder).docType("book").toFile(file);
-		asciidoctor.convertFile(this.getIndexAdoc(this.properties.getRoot()), optionsBuilder);
+		var optionsBuilder = this.buildCommonOptions("pdf", attributesBuilder.build()).docType("book").toFile(file);
+		asciidoctor.convertFile(this.getIndexAdoc(this.properties.getRoot()), optionsBuilder.build());
 		log.info("inside " + this.getClass().getName() + " & just created " + file.getAbsolutePath() + '.');
 		return file;
 	}

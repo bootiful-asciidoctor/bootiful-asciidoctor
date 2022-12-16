@@ -2,10 +2,9 @@ package app;
 
 import bootiful.asciidoctor.PipelineJobProperties;
 import bootiful.asciidoctor.autoconfigure.DocumentProducer;
-import lombok.extern.log4j.Log4j2;
-import org.eclipse.jgit.api.Git;
-import org.junit.Assert;
-import org.junit.Before;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +14,10 @@ import org.springframework.test.context.ActiveProfiles;
 import java.io.File;
 import java.util.Objects;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.util.AssertionErrors.assertTrue;
 
-@Log4j2
+@Slf4j
 @ActiveProfiles("git")
 @SpringBootTest(classes = AsciidoctorPublicationJobApplication.class)
 public class EndToEndApplicationTest {
@@ -28,9 +28,9 @@ public class EndToEndApplicationTest {
 	@Autowired
 	private ObjectProvider<DocumentProducer> producers;
 
-	@Before
-	public void before() throws Exception {
-		// todo sweep throught he configured Amazon S3 bucket and delete everything to
+	@BeforeEach
+	public void before() {
+		// todo sweep through the configured Amazon S3 bucket and delete everything to
 		// periodically purge old files
 	}
 
@@ -42,7 +42,7 @@ public class EndToEndApplicationTest {
 		assertTrue("the target directory " + target.getAbsolutePath() + " already exists.", target.exists());
 		var foldersLength = Objects.requireNonNull(target.listFiles(File::isDirectory)).length;
 		assertTrue("there are 4 or more " + DocumentProducer.class.getName() + " instances.", foldersLength >= 4);
-		Assert.assertEquals(countOfProducers, foldersLength);
+		assertEquals(countOfProducers, foldersLength);
 	}
 
 }

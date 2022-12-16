@@ -6,17 +6,18 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.6</version>
+        <version>3.0.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>bootiful.asciidoctor</groupId>
     <packaging>pom</packaging>
     <artifactId>parent</artifactId>
     <name>bootiful-asciidoctor</name>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.0.4-SNAPSHOT</version>
     <properties>
+        <jruby.version>9.4.0.0</jruby.version>
         <aws-java-sdk.version>1.12.352</aws-java-sdk.version>
-        <asciidoctorj-pdf.version>2.3.3</asciidoctorj-pdf.version>
+        <asciidoctorj-pdf.version>2.3.0</asciidoctorj-pdf.version>
         <asciidoctorj-epub3.version>1.5.1</asciidoctorj-epub3.version>
         <java.version>17</java.version>
     </properties>
@@ -54,7 +55,8 @@
             <dependency>
                 <groupId>org.jruby</groupId>
                 <artifactId>jruby-complete</artifactId>
-                <version>9.2.7.0</version>
+                <version>${jruby.version}</version>
+                <!-- <version>9.2.7.0</version> -->
             </dependency>
             <dependency>
                 <groupId>org.asciidoctor</groupId>
@@ -90,7 +92,7 @@
             <plugin>
                 <groupId>org.jfrog.buildinfo</groupId>
                 <artifactId>artifactory-maven-plugin</artifactId>
-                <version>2.4.0</version>
+                <version>3.4.0</version>
                 <inherited>false</inherited>
                 <executions>
                     <execution>
