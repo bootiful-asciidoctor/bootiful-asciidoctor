@@ -4,7 +4,6 @@ import bootiful.asciidoctor.autoconfigure.DocumentProducer;
 import bootiful.asciidoctor.autoconfigure.FileCopyUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;

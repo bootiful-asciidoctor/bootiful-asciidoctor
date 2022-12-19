@@ -16,7 +16,7 @@ import org.springframework.core.task.TaskExecutor;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-class BootifulAsciidoctorJobConfiguration {
+class JobConfiguration {
 
 	private final static String SPLIT_FLOW_ID = "splitFlow";
 

@@ -5,7 +5,6 @@ import bootiful.asciidoctor.autoconfigure.FileCopyUtils;
 import bootiful.asciidoctor.files.FileUtils;
 import bootiful.asciidoctor.git.GitCloneCallback;
 import bootiful.asciidoctor.git.GitPushCallback;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.api.CreateBranchCommand;
 import org.springframework.util.Assert;

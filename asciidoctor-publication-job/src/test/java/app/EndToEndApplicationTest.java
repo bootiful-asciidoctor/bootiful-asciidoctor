@@ -1,13 +1,8 @@
 package app;
 
-import bootiful.asciidoctor.PipelineJobProperties;
-import bootiful.asciidoctor.autoconfigure.DocumentProducer;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
-import org.springframework.test.context.ActiveProfiles;
 
 @Slf4j
 // @ActiveProfiles("git")

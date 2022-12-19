@@ -1,10 +1,6 @@
 package bootiful.asciidoctor.autoconfigure;
 
 import lombok.extern.slf4j.Slf4j;
-import org.asciidoctor.Asciidoctor;
-import org.junit.jupiter.api.Assertions;
-
-import java.io.File;
 
 /**
  * todo bless this as a real test for CI

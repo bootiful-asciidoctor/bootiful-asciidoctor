@@ -2,8 +2,6 @@ package bootiful.asciidoctor.autoconfigure;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.util.Assert;
 
 import java.io.File;
@@ -23,8 +21,7 @@ class DocumentProducerProcessor {
 
 	private final PublicationProperties properties;
 
-	// todo figure out if this is required
-	// @EventListener(ApplicationReadyEvent.class)
+	// todo figure out if this is required // @EventListener(ApplicationReadyEvent.class)
 	public void produceDocuments() {
 		log.info("there are " + this.producers.length + " " + DocumentProducer.class.getName() + " instances");
 		Stream.of(this.producers).forEach(producer -> {

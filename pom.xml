@@ -15,7 +15,7 @@
     <name>bootiful-asciidoctor</name>
     <version>0.0.4-SNAPSHOT</version>
     <properties>
-        <jruby.version>9.4.0.0</jruby.version>
+        <jruby.version>9.3.4.0</jruby.version>
         <aws-java-sdk.version>1.12.352</aws-java-sdk.version>
         <asciidoctorj-pdf.version>2.3.0</asciidoctorj-pdf.version>
         <asciidoctorj-epub3.version>1.5.1</asciidoctorj-epub3.version>
@@ -55,14 +55,13 @@
             </dependency>
             <dependency>
                 <groupId>org.jruby</groupId>
-                <artifactId>jruby-complete</artifactId>
+                <artifactId>jruby</artifactId>
                 <version>${jruby.version}</version>
-                <!-- <version>9.2.7.0</version> -->
             </dependency>
             <dependency>
                 <groupId>org.asciidoctor</groupId>
                 <artifactId>asciidoctorj</artifactId>
-                <version>2.5.7</version>
+                <version>2.5.4</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.jruby</groupId>
@@ -72,8 +71,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-
     <build>
         <plugins>
             <plugin>

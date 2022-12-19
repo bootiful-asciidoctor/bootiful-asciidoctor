@@ -1,12 +1,12 @@
 package bootiful.asciidoctor;
 
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.util.Collection;
 import java.util.Map;
 
-@Log4j2
+@Slf4j
 class CompositeDocumentPublisher implements DocumentPublisher {
 
 	private final DocumentPublisher[] publishers;

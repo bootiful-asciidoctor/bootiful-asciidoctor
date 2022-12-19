@@ -80,6 +80,7 @@ class MobiProducer implements DocumentProducer {
 				var outputStream = new FileOutputStream(binaryLocation)) {
 			FileCopyUtils.copy(inputStream, outputStream);
 		}
+		// binaryLocation.setExecutable(true);
 		Assert.state(0 == Runtime.getRuntime().exec("chmod a+x " + binaryLocation.getAbsolutePath()).waitFor(),
 				"couldn't make the kindlegen binary executable");
 	}
