@@ -24,6 +24,7 @@
     <modules>
         <module>asciidoctor-autoconfiguration</module>
         <module>asciidoctor-publication-job</module>
+        <module>app</module>
     </modules>
     <dependencyManagement>
         <dependencies>

@@ -95,7 +95,7 @@ class GitCloneCodeStepConfiguration {
 	}
 
 	@Bean
-	Flow gitCloneCodeFlow() {
+	Flow codeFlow() {
 		return new FlowBuilder<Flow>("gitCloneRepositoriesFlow")//
 				.start(gitCloneCodeStep()) //
 				.build();

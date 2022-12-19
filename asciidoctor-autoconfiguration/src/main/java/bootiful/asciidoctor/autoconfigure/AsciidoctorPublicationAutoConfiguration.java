@@ -5,19 +5,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.asciidoctor.Asciidoctor;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 
 import java.io.File;
 import java.util.function.Supplier;
 
-// todo wrap all of these {@link DocumentProducer} implementations in a delegating implementation that involves the real thing IF the '.enabled' property is true. otherwise, NO-OP.
-// we cant use the @conditionalOnProperty anymore as the bean graph is fixed in an AOT situation
 @Slf4j
-@Configuration
+@AutoConfiguration
 @EnableConfigurationProperties(PublicationProperties.class)
 @ConditionalOnClass(Asciidoctor.class)
 class AsciidoctorPublicationAutoConfiguration {
@@ -37,7 +35,7 @@ class AsciidoctorPublicationAutoConfiguration {
 	 */
 	@Bean
 	DocumentProducer mobiProducer(PublicationProperties pp, @Value("classpath:/kindlegen") Resource kindlegen,
-			Asciidoctor asciidoctor) throws Exception {
+			Asciidoctor asciidoctor) {
 		var linux = System.getProperty("os.name").toLowerCase().contains("linux");
 		return new EnabledDelegatingDocumentProducer(() -> new MobiProducer(pp, asciidoctor, kindlegen),
 				nameFor(MobiProducer.class), linux && pp.mobi() != null && pp.mobi().enabled());

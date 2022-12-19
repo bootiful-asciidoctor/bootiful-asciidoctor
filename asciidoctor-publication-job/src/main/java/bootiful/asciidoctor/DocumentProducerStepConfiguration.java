@@ -29,8 +29,9 @@ class DocumentProducerStepConfiguration {
 			if (beans instanceof BeanDefinitionRegistry bdr) {
 				var beanNamesForType = beans.getBeanNamesForType(DocumentProducer.class);
 				for (var beanName : beanNamesForType) {
-					var beanDefinition = BeanDefinitionBuilder
-							.genericBeanDefinition(Flow.class, () -> buildFlow(beans, beanName)).getBeanDefinition();
+					var beanDefinition = BeanDefinitionBuilder//
+							.genericBeanDefinition(Flow.class, () -> buildFlow(beans, beanName))//
+							.getBeanDefinition();
 					beanDefinition.addQualifier(new AutowireCandidateQualifier(DocumentProducerFlow.class));
 					bdr.registerBeanDefinition(beanName + "FlowRegistration", beanDefinition);
 				}

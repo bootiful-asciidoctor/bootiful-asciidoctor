@@ -67,7 +67,6 @@ class DocumentProducerTasklet implements Tasklet {
 					newFile.getParentFile().mkdirs();
 			}
 		}
-
 		FileCopyUtils.copy(file, newFile);
 	}
 

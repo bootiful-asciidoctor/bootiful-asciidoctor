@@ -8,6 +8,7 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
+import org.springframework.util.Assert;
 
 import java.io.File;
 import java.util.Collection;
@@ -26,11 +27,11 @@ class DocumentPublisherTasklet implements ApplicationEventPublisherAware, Taskle
 	@Override
 	@SuppressWarnings("unchecked")
 	public RepeatStatus execute(StepContribution contribution, ChunkContext context) throws Exception {
+		Assert.notNull(this.applicationEventPublisher.get(), "the applicationEventPublisher must be non-null");
 		var executionContext = context.getStepContext().getStepExecution().getJobExecution().getExecutionContext();
 		var files = Objects.requireNonNull((Map<String, Collection<File>>) executionContext.get("files"));
-		var msg = "using " + DocumentPublisher.class.getSimpleName() + " instance "
-				+ this.publisher.getClass().getName() + '.' + " " + "There are " + files + " to process. " + files;
-		log.info(msg);
+		log.info("using " + DocumentPublisher.class.getSimpleName() + " instance " + this.publisher.getClass().getName()
+				+ '.' + " " + "There are " + files + " to process. " + files);
 		this.publisher.publish(files);
 		this.applicationEventPublisher.get().publishEvent(new DocumentsPublishedEvent(files));
 		return RepeatStatus.FINISHED;

@@ -19,7 +19,7 @@ public record PipelineJobProperties(boolean enabled, File root, String bookName,
 
 	@PostConstruct
 	public void validate() {
-		log.info("validating " + this.getClass().getName());
+		log.debug("validating " + this.getClass().getName());
 		if (!this.target.exists()) {
 			this.target.mkdirs();
 		}

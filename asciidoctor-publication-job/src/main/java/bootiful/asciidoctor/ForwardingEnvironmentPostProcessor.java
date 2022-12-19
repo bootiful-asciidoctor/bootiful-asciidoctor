@@ -1,7 +1,6 @@
 package bootiful.asciidoctor;
 
 import bootiful.asciidoctor.files.FileUtils;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
@@ -40,12 +39,7 @@ class ForwardingEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
 			@Override
 			public Object getProperty(String name) {
-
-				if (mappings.containsKey(name)) {
-					log.debug("mapping " + name + " to " + mappings.get(name));
-					return mappings.get(name);
-				}
-				return null;
+				return mappings.getOrDefault(name, null);
 			}
 		};
 		environment.getPropertySources().addLast(propertySource);

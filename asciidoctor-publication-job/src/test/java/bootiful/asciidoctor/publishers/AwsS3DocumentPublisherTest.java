@@ -40,7 +40,8 @@ class AwsS3DocumentPublisherTest {
 	private AmazonS3 buildAmazonS3Instance(String accessKey, String secret, String region) {
 		var credentials = new BasicAWSCredentials(accessKey, secret);
 		var timeout = 5 * 60 * 1000;
-		var clientConfiguration = new ClientConfiguration().withClientExecutionTimeout(timeout) //
+		var clientConfiguration = new ClientConfiguration()//
+				.withClientExecutionTimeout(timeout) //
 				.withConnectionMaxIdleMillis(timeout) //
 				.withConnectionTimeout(timeout) //
 				.withConnectionTTL(timeout)//

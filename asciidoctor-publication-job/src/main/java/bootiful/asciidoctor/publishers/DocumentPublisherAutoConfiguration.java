@@ -9,6 +9,7 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -20,7 +21,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Josh Long
  * @author Trisha Gee
  */
-@Configuration
+@AutoConfiguration
 @RequiredArgsConstructor
 @EnableConfigurationProperties(PipelineJobPublishersProperties.class)
 class DocumentPublisherAutoConfiguration {
@@ -31,8 +32,8 @@ class DocumentPublisherAutoConfiguration {
 	@ConditionalOnProperty(value = "pipeline.job.publishers.git.enabled", havingValue = "true")
 	GitBranchDocumentPublisher gitBranchDocumentPublisher(GitPushCallback gitPushCallback,
 			GitCloneCallback gitCloneCallback) {
-		var repo = this.properties.getGit().getRepository();
-		var branch = this.properties.getGit().getArtifactBranch();
+		var repo = this.properties.git().repository();
+		var branch = this.properties.git().artifactBranch();
 		return new GitBranchDocumentPublisher(repo, branch, gitPushCallback, gitCloneCallback);
 	}
 
@@ -46,16 +47,16 @@ class DocumentPublisherAutoConfiguration {
 
 		@Bean
 		AwsS3DocumentPublisher awsS3DocumentPublisher(AmazonS3 s3) {
-			return new AwsS3DocumentPublisher(s3, this.properties.getS3().getBucketName());
+			return new AwsS3DocumentPublisher(s3, this.properties.s3().bucketName());
 		}
 
 		@Bean
 		@ConditionalOnMissingBean
 		AmazonS3 amazonS3() {
-			var s3 = this.properties.getS3();
-			var accessKey = s3.getAccessKeyId();
-			var secret = s3.getSecretAccessKey();
-			var region = s3.getRegion();
+			var s3 = this.properties.s3();
+			var accessKey = s3.accessKeyId();
+			var secret = s3.secretAccessKey();
+			var region = s3.region();
 			var credentials = new BasicAWSCredentials(accessKey, secret);
 			var timeout = 5 * 60 * 1000;
 			var clientConfiguration = new ClientConfiguration().withClientExecutionTimeout(timeout)

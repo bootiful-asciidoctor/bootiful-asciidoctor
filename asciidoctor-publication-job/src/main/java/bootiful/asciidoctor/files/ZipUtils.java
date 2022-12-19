@@ -1,7 +1,6 @@
 package bootiful.asciidoctor.files;
 
 import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 
@@ -9,7 +8,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -53,8 +51,10 @@ public abstract class ZipUtils {
 	}
 
 	private static File getCommonDirectoryFor(File[] files) {
-		var stringsArray = Stream.of(files).map(File::getAbsolutePath).collect(Collectors.toList())
-				.toArray(new String[files.length]);
+		var stringsArray = Stream//
+				.of(files)//
+				.map(File::getAbsolutePath)//
+				.toArray(String[]::new);
 		var commonRoot = getLongestCommonPrefix(stringsArray);
 		var root = new File(commonRoot);
 		while (!root.isDirectory()) {

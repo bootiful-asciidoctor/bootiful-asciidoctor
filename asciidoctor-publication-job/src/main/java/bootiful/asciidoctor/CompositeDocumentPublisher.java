@@ -14,8 +14,10 @@ class CompositeDocumentPublisher implements DocumentPublisher {
 	private final DocumentPublisher noOpDefault = (files) -> log
 			.info("No " + DocumentPublisher.class.getSimpleName() + " configured to publish " + files);
 
+	private final DocumentPublisher[] defaults = new DocumentPublisher[] { this.noOpDefault };
+
 	CompositeDocumentPublisher(DocumentPublisher[] p) {
-		this.publishers = p == null || p.length == 0 ? new DocumentPublisher[] { this.noOpDefault } : p;
+		this.publishers = p == null || p.length == 0 ? this.defaults : p;
 		if (log.isDebugEnabled()) {
 			log.debug("there are " + this.publishers.length + " " + DocumentPublisher.class.getName()
 					+ " instances configured");

@@ -25,12 +25,12 @@ class GitCloneDocsStepConfiguration {
 
 	private final GitCloneCallback cloneCallback;
 
-	private final JobRepository jr;
+	private final JobRepository jobRepository;
 
 	private final PlatformTransactionManager ptx;
 
 	@Bean
-	Flow gitCloneDocsFlow() {
+	Flow docsFlow() {
 		return new FlowBuilder<Flow>("gitCloneDocsFlow")//
 				.start(gitCloneDocsStep()) //
 				.build();
@@ -38,7 +38,7 @@ class GitCloneDocsStepConfiguration {
 
 	@Bean
 	Step gitCloneDocsStep() {
-		return new StepBuilder("clone-docs-step", jr) //
+		return new StepBuilder("gitCloneDocsStep", this.jobRepository) //
 				.tasklet((stepContribution, chunkContext) -> {
 					log.info("going to clone");
 					var docs = FileUtils.getDocsDirectory(pipelineJobProperties.root());

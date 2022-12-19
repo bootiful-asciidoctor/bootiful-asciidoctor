@@ -2,6 +2,8 @@ package bootiful.asciidoctor;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.job.builder.FlowBuilder;
+import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.beans.factory.ObjectProvider;
@@ -22,8 +24,13 @@ class DocumentPublisherStepConfiguration {
 	@Bean
 	Step documentPublisherStep() {
 		return new StepBuilder("documentPublisherStep", this.repository)//
-				.tasklet(documentPublisherTasklet(), this.transactionManager) //
+				.tasklet(this.documentPublisherTasklet(), this.transactionManager) //
 				.build();
+	}
+
+	@Bean
+	Flow publicationFlow() {
+		return new FlowBuilder<Flow>("documentPublisherFlow").start(documentPublisherStep()).build();
 	}
 
 	@Bean

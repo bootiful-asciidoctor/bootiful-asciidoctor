@@ -23,7 +23,8 @@ class DocumentProducerProcessor {
 
 	private final PublicationProperties properties;
 
-	@EventListener(ApplicationReadyEvent.class)
+	// todo figure out if this is required
+	// @EventListener(ApplicationReadyEvent.class)
 	public void produceDocuments() {
 		log.info("there are " + this.producers.length + " " + DocumentProducer.class.getName() + " instances");
 		Stream.of(this.producers).forEach(producer -> {
