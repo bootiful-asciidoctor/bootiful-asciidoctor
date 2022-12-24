@@ -1,48 +1,39 @@
 package app;
 
-import bootiful.asciidoctor.PipelineJobProperties;
-import bootiful.asciidoctor.autoconfigure.DocumentProducer;
-import lombok.extern.log4j.Log4j2;
-import org.eclipse.jgit.api.Git;
-import org.junit.Assert;
-import org.junit.Before;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.boot.SpringApplication;
 
-import java.io.File;
-import java.util.Objects;
-
-import static org.junit.Assert.assertTrue;
-
-@Log4j2
-@ActiveProfiles("git")
-@SpringBootTest(classes = AsciidoctorPublicationJobApplication.class)
+@Slf4j
+// @ActiveProfiles("git")
+// @SpringBootTest(classes = AsciidoctorPublicationJobApplication.class)
 public class EndToEndApplicationTest {
 
-	@Autowired
-	private PipelineJobProperties pipelineJobProperties;
+	////
+	//// private final PipelineJobProperties pipelineJobProperties;
+	////
+	// private final ObjectProvider<DocumentProducer> producers;
 
-	@Autowired
-	private ObjectProvider<DocumentProducer> producers;
-
-	@Before
-	public void before() throws Exception {
-		// todo sweep throught he configured Amazon S3 bucket and delete everything to
-		// periodically purge old files
-	}
+	// @Autowired
+	// EndToEndApplicationTest(PipelineJobProperties pipelineJobProperties,
+	// ObjectProvider<DocumentProducer> producers) {
+	// this.pipelineJobProperties = pipelineJobProperties;
+	// this.producers = producers;
+	// }
 
 	@Test
 	public void runAppEndToEnd() {
-		var countOfProducers = this.producers.stream().count();
-		log.info("running the application end to end...");
-		var target = this.pipelineJobProperties.getTarget();
-		assertTrue("the target directory " + target.getAbsolutePath() + " already exists.", target.exists());
-		var foldersLength = Objects.requireNonNull(target.listFiles(File::isDirectory)).length;
-		assertTrue("there are 4 or more " + DocumentProducer.class.getName() + " instances.", foldersLength >= 4);
-		Assert.assertEquals(countOfProducers, foldersLength);
+		var app = SpringApplication.run(AsciidoctorPublicationJobApplication.class);
+		// var countOfProducers = this.producers.stream().count();
+		// log.info("running the application end to end...");
+		// var target = this.pipelineJobProperties.target();
+		// assertTrue("the target directory " + target.getAbsolutePath() + " already
+		// exists.", target.exists());
+		// var foldersLength =
+		// Objects.requireNonNull(target.listFiles(File::isDirectory)).length;
+		// assertTrue("there are 4 or more " + DocumentProducer.class.getName() + "
+		// instances.", foldersLength >= 4);
+		// assertEquals(countOfProducers, foldersLength);
 	}
 
 }

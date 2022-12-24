@@ -4,7 +4,7 @@ import bootiful.asciidoctor.autoconfigure.DocumentProducer;
 import bootiful.asciidoctor.autoconfigure.FileCopyUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Log4j2
+@Slf4j
 @RequiredArgsConstructor
 class DocumentProducerTasklet implements Tasklet {
 
@@ -40,6 +40,9 @@ class DocumentProducerTasklet implements Tasklet {
 
 	@SuppressWarnings("unchecked")
 	private void contributeFilesToOutput(ChunkContext context, File[] fileArray) {
+		if (fileArray.length == 0)
+			return;
+
 		var executionContext = context.getStepContext() //
 				.getStepExecution() //
 				.getJobExecution()//
@@ -63,7 +66,6 @@ class DocumentProducerTasklet implements Tasklet {
 					newFile.getParentFile().mkdirs();
 			}
 		}
-
 		FileCopyUtils.copy(file, newFile);
 	}
 

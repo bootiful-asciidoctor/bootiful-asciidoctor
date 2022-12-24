@@ -2,7 +2,7 @@ package bootiful.asciidoctor.publishers;
 
 import bootiful.asciidoctor.files.ZipUtils;
 import lombok.SneakyThrows;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
@@ -16,17 +16,17 @@ class ZipUtilsTest {
 		var html = fileFromClassPathPath("files/html/index.html");
 		var files = new File[] { epub, html };
 		for (var f : files) {
-			Assert.assertTrue("the file " + f.getAbsolutePath() + " does not exist!", f.exists());
+			Assertions.assertTrue(f.exists(), "the file " + f.getAbsolutePath() + " does not exist!");
 		}
 		var zip = new File(new File(System.getenv("HOME"), "Desktop"), "files.zip");
 		if (!zip.getParentFile().exists())
 			zip.getParentFile().mkdirs();
-		Assert.assertFalse(zip.exists());
+		Assertions.assertFalse(zip.exists());
 		ZipUtils.buildZipFileFromFiles(zip, files);
-		Assert.assertTrue(zip.exists());
-		Assert.assertTrue(zip.length() > 0);
+		Assertions.assertTrue(zip.exists());
+		Assertions.assertTrue(zip.length() > 0);
 		zip.delete();
-		Assert.assertFalse(zip.exists());
+		Assertions.assertFalse(zip.exists());
 
 	}
 

@@ -8,7 +8,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -20,7 +20,7 @@ import java.util.*;
 /**
  * Archives the published artifacts and writes them AWS S3
  */
-@Log4j2
+@Slf4j
 @RequiredArgsConstructor
 class AwsS3DocumentPublisher implements DocumentPublisher {
 

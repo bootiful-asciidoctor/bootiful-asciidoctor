@@ -1,59 +1,71 @@
 package bootiful.asciidoctor.autoconfigure;
 
-import lombok.extern.log4j.Log4j2;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.asciidoctor.Asciidoctor;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.*;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
-import org.springframework.core.type.AnnotatedTypeMetadata;
 
-@Log4j2
-@Configuration(proxyBeanMethods = false)
+import java.io.File;
+import java.util.function.Supplier;
+
+@Slf4j
+@AutoConfiguration
 @EnableConfigurationProperties(PublicationProperties.class)
 @ConditionalOnClass(Asciidoctor.class)
 class AsciidoctorPublicationAutoConfiguration {
 
+	private static String nameFor(Class<? extends DocumentProducer> clzz) {
+		return clzz.getName();
+	}
+
 	@Bean
-	@ConditionalOnProperty(name = "publication.epub.enabled", havingValue = "true", matchIfMissing = true)
-	EpubProducer epubProducer(PublicationProperties pp, Asciidoctor asciidoctor) {
-		return new EpubProducer(pp, asciidoctor);
+	DocumentProducer epubProducer(PublicationProperties pp, Asciidoctor asciidoctor) {
+		return new EnabledDelegatingDocumentProducer(() -> new EpubProducer(pp, asciidoctor),
+				nameFor(EpubProducer.class), pp.epub() != null && pp.epub().enabled());
 	}
 
 	/**
 	 * this only works if you've opted into it <em>and</em> you're running on Linux
 	 */
 	@Bean
-	@Conditional(LinuxCondition.class)
-	@ConditionalOnProperty(name = "publication.mobi.enabled", havingValue = "true", matchIfMissing = false)
-	MobiProducer mobiProducer(PublicationProperties pp, @Value("classpath:/kindlegen") Resource kindlegen,
-			Asciidoctor asciidoctor) throws Exception {
-		return new MobiProducer(pp, asciidoctor, kindlegen);
+	DocumentProducer mobiProducer(PublicationProperties pp, @Value("classpath:/kindlegen") Resource kindlegen,
+			Asciidoctor asciidoctor) {
+		var linux = System.getProperty("os.name").toLowerCase().contains("linux");
+		return new EnabledDelegatingDocumentProducer(() -> new MobiProducer(pp, asciidoctor, kindlegen),
+				nameFor(MobiProducer.class), linux && pp.mobi() != null && pp.mobi().enabled());
 	}
 
 	@Bean
-	@ConditionalOnProperty(name = "publication.html.enabled", havingValue = "true", matchIfMissing = true)
-	HtmlProducer htmlProducer(PublicationProperties pp, Asciidoctor asciidoctor) {
-		return new HtmlProducer(pp, asciidoctor);
+	DocumentProducer htmlProducer(PublicationProperties pp, Asciidoctor asciidoctor) {
+		return new EnabledDelegatingDocumentProducer(() -> new HtmlProducer(pp, asciidoctor),
+				nameFor(HtmlProducer.class), pp.html() != null && pp.html().enabled());
 	}
 
 	@Bean
-	@ConditionalOnProperty(name = "publication.pdf.screen.enabled", havingValue = "true", matchIfMissing = true)
-	ScreenPdfProducer screenPdfProducer(PublicationProperties pp, Asciidoctor asciidoctor) {
-		return new ScreenPdfProducer(pp, asciidoctor);
+	DocumentProducer screenPdfProducer(PublicationProperties pp, Asciidoctor asciidoctor) {
+		return new EnabledDelegatingDocumentProducer(() -> new ScreenPdfProducer(pp, asciidoctor),
+				nameFor(ScreenPdfProducer.class),
+				pp.pdf() != null && pp.pdf().screen() != null && pp.pdf().screen().enabled());
 	}
 
 	@Bean
-	@ConditionalOnProperty(name = "publication.runner.enabled", havingValue = "true", matchIfMissing = false)
-	DocumentProducerProcessor documentProducerProcessor(Asciidoctor ad, ObjectProvider<DocumentProducer> dps,
+	DocumentProducer prepressPdfProducer(PublicationProperties pp, Asciidoctor asciidoctor) {
+		return new EnabledDelegatingDocumentProducer(() -> new PrepressPdfProducer(pp, asciidoctor),
+				nameFor(PrepressPdfProducer.class),
+				pp.pdf() != null && pp.pdf().prepress() != null && pp.pdf().prepress().enabled());
+	}
+
+	@Bean
+	DocumentProducerProcessor documentProducerProcessor(ObjectProvider<DocumentProducer> dps,
 			PublicationProperties pp) {
 		var array = dps.stream().toArray(DocumentProducer[]::new);
-		return new DocumentProducerProcessor(ad, array, pp);
+		return new DocumentProducerProcessor(array, pp);
 	}
 
 	@Bean
@@ -63,20 +75,27 @@ class AsciidoctorPublicationAutoConfiguration {
 		return asciidoctor;
 	}
 
-	@Bean
-	@ConditionalOnProperty(name = "publication.pdf.prepress.enabled", havingValue = "true", matchIfMissing = true)
-	PrepressPdfProducer prepressPdfProducer(PublicationProperties pp, Asciidoctor asciidoctor) {
-		return new PrepressPdfProducer(pp, asciidoctor);
-	}
-
 }
 
-@Order(Ordered.HIGHEST_PRECEDENCE + 20)
-class LinuxCondition implements Condition {
+@Slf4j
+@RequiredArgsConstructor
+class EnabledDelegatingDocumentProducer implements DocumentProducer {
+
+	private final Supplier<DocumentProducer> dp;
+
+	private final String name;
+
+	private final boolean enabled;
 
 	@Override
-	public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-		return System.getProperty("os.name").toLowerCase().contains("linux");
+	public File[] produce() throws Exception {
+		if (!this.enabled) {
+			if (log.isDebugEnabled())
+				log.debug("not running " + name + " as it is not enabled.");
+			return new File[0];
+		}
+		log.info("running " + this.name);
+		return this.dp.get().produce();
 	}
 
 }

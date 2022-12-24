@@ -8,22 +8,9 @@
         <version>0.0.4-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
-    <artifactId>asciidoctor-publication-job</artifactId>
+    <artifactId>app</artifactId>
     <dependencies>
-        <dependency>
-            <optional>true</optional>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk</artifactId>
-        </dependency>
-        <dependency>
-            <optional>true</optional>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-sts</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.joshlong</groupId>
-            <artifactId>git-spring-boot-starter</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
@@ -31,13 +18,10 @@
         </dependency>
         <dependency>
             <groupId>bootiful.asciidoctor</groupId>
-            <artifactId>asciidoctor-autoconfiguration</artifactId>
+            <artifactId>asciidoctor-publication-job</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-batch</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
@@ -53,19 +37,23 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.junit.vintage</groupId>
-                    <artifactId>junit-vintage-engine</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.batch</groupId>
-            <artifactId>spring-batch-test</artifactId>
-            <scope>test</scope>
-        </dependency>
+
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <jvmArguments>
+                        -agentlib:native-image-agent=config-output-dir=target/native-image
+                    </jvmArguments>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 
 </project>

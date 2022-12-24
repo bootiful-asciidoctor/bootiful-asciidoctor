@@ -1,14 +1,13 @@
 package bootiful.asciidoctor.files;
 
 import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -17,7 +16,7 @@ import java.util.zip.ZipOutputStream;
  * Zip files are a common way to communicate the aggregation of the output of the
  * pipeline. This class supports easy archival.
  */
-@Log4j2
+@Slf4j
 public abstract class ZipUtils {
 
 	public static void buildZipFileFromDirectory(File zipFile, File directory) {
@@ -52,8 +51,10 @@ public abstract class ZipUtils {
 	}
 
 	private static File getCommonDirectoryFor(File[] files) {
-		var stringsArray = Stream.of(files).map(File::getAbsolutePath).collect(Collectors.toList())
-				.toArray(new String[files.length]);
+		var stringsArray = Stream//
+				.of(files)//
+				.map(File::getAbsolutePath)//
+				.toArray(String[]::new);
 		var commonRoot = getLongestCommonPrefix(stringsArray);
 		var root = new File(commonRoot);
 		while (!root.isDirectory()) {
@@ -63,10 +64,10 @@ public abstract class ZipUtils {
 	}
 
 	private static String getLongestCommonPrefix(String[] s) {
-		int k = s[0].length();
-		for (int i = 1; i < s.length; i++) {
+		var k = s[0].length();
+		for (var i = 1; i < s.length; i++) {
 			k = Math.min(k, s[i].length());
-			for (int j = 0; j < k; j++)
+			for (var j = 0; j < k; j++)
 				if (s[i].charAt(j) != s[0].charAt(j)) {
 					k = j;
 					break;

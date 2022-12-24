@@ -1,6 +1,6 @@
 package bootiful.asciidoctor.autoconfigure;
 
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 
@@ -11,7 +11,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
-@Log4j2
+@Slf4j
 public abstract class FileCopyUtils {
 
 	public static void copy(InputStream i, OutputStream o) {

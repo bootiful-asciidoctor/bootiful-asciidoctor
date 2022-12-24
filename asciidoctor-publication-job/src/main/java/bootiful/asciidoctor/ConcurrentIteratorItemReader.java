@@ -2,8 +2,6 @@ package bootiful.asciidoctor;
 
 import org.springframework.batch.item.support.IteratorItemReader;
 
-import java.util.Iterator;
-
 /**
  * This is important because the reads happen in a
  * {@link org.springframework.batch.core.Step} with a
@@ -14,11 +12,7 @@ class ConcurrentIteratorItemReader<T> extends IteratorItemReader<T> {
 
 	private final Object monitor = new Object();
 
-	public ConcurrentIteratorItemReader(Iterator<T> iterator) {
-		super(iterator);
-	}
-
-	public ConcurrentIteratorItemReader(Iterable<T> iterable) {
+	ConcurrentIteratorItemReader(Iterable<T> iterable) {
 		super(iterable);
 	}
 

@@ -1,12 +1,12 @@
 package bootiful.asciidoctor.files;
 
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 import org.springframework.util.FileSystemUtils;
 
 import java.io.File;
 
-@Log4j2
+@Slf4j
 public abstract class FileUtils {
 
 	public static File getCodeDirectory(File root) {
@@ -24,7 +24,7 @@ public abstract class FileUtils {
 			FileSystemUtils.deleteRecursively(file);
 		}
 		if (!file.exists()) {
-			log.info("trying to create " + file.getAbsolutePath() + '.');
+			log.debug("trying to create " + file.getAbsolutePath() + '.');
 			file.mkdirs();
 		}
 		Assert.state(file.exists(), () -> "the directory " + file.getAbsolutePath() + " does not exist");

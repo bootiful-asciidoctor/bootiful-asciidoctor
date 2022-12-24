@@ -2,13 +2,13 @@ package bootiful.asciidoctor.autoconfigure;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.asciidoctor.Asciidoctor;
 
 import java.io.File;
 import java.util.ArrayList;
 
-@Log4j2
+@Slf4j
 abstract class AbstractPdfProducer implements DocumentProducer {
 
 	private final PublicationProperties properties;
@@ -52,20 +52,20 @@ abstract class AbstractPdfProducer implements DocumentProducer {
 		var media = this.getPdfProducerConfiguration().getMedia();
 		var files = new ArrayList<File>();
 		var regularFile = this.producePdf(media,
-				new File(this.properties.getRoot(), "index-" + media.toLowerCase() + ".pdf"));
+				new File(this.properties.root(), "index-" + media.toLowerCase() + ".pdf"));
 		files.add(regularFile);
 		return files.toArray(new File[0]);
 	}
 
 	private File producePdf(String media, File file) {
-		var bookName = this.properties.getBookName();
-		var indexAdoc = getIndexAdoc(this.properties.getRoot());
-		var pdf = this.properties.getPdf();
-		var attributesBuilder = this.buildCommonAttributes(bookName, pdf.getIsbn(), indexAdoc)
+		var bookName = this.properties.bookName();
+		var indexAdoc = getIndexAdoc(this.properties.root());
+		var pdf = this.properties.pdf();
+		var attributesBuilder = this.buildCommonAttributes(bookName, pdf.isbn(), indexAdoc)
 				.attribute("idseparator", "-") //
 				.imagesDir("images") //
 				.attribute("media", media) //
-				.attribute("code", this.properties.getCode().getAbsolutePath()) //
+				.attribute("code", this.properties.code().getAbsolutePath()) //
 				.attribute("icons", "font") //
 				.attribute("pdf-style", media) //
 				.attribute("idprefix") //
@@ -74,17 +74,17 @@ abstract class AbstractPdfProducer implements DocumentProducer {
 				.attribute("project-name", bookName) //
 				.attribute("pdfmarks")//
 				.attribute("notitle")//
-				.attribute("pdf-stylesdir", pdf.getStyles().getAbsolutePath()) //
-				.attribute("pdf-fontsdir", pdf.getFonts().getAbsolutePath());
+				.attribute("pdf-stylesdir", pdf.styles().getAbsolutePath()) //
+				.attribute("pdf-fontsdir", pdf.fonts().getAbsolutePath());
 
 		if (this.getPdfProducerConfiguration().isOptimize()) {
 			PdfOptimizerQuality pdfOptimizerQuality = this.getPdfProducerConfiguration().getPdfOptimizerQuality();
-			log.debug(() -> "optimize value = " + pdfOptimizerQuality.toString().toLowerCase());
+			log.debug("optimize value = " + pdfOptimizerQuality.toString().toLowerCase());
 			attributesBuilder.attribute("optimize", pdfOptimizerQuality.toString().toLowerCase());
 		}
 
-		var optionsBuilder = this.buildCommonOptions("pdf", attributesBuilder).docType("book").toFile(file);
-		asciidoctor.convertFile(this.getIndexAdoc(this.properties.getRoot()), optionsBuilder);
+		var optionsBuilder = this.buildCommonOptions("pdf", attributesBuilder.build()).docType("book").toFile(file);
+		asciidoctor.convertFile(this.getIndexAdoc(this.properties.root()), optionsBuilder.build());
 		log.info("inside " + this.getClass().getName() + " & just created " + file.getAbsolutePath() + '.');
 		return file;
 	}

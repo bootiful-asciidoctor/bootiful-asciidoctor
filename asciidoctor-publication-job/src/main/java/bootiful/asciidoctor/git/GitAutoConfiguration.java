@@ -1,8 +1,9 @@
 package bootiful.asciidoctor.git;
 
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.transport.CredentialsProvider;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -12,8 +13,8 @@ import org.springframework.context.annotation.Configuration;
  * Autoconfiguration to customize how the pipeline handles interactions with Git when
  * needed.
  */
-@Log4j2
-@Configuration
+@Slf4j
+@AutoConfiguration
 class GitAutoConfiguration {
 
 	/**

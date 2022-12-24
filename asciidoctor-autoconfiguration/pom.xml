@@ -6,13 +6,10 @@
     <parent>
         <groupId>bootiful.asciidoctor</groupId>
         <artifactId>parent</artifactId>
-        <version>0.0.2-SNAPSHOT</version>
+        <version>0.0.4-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
     <artifactId>asciidoctor-autoconfiguration</artifactId>
-    <properties>
-        <java.version>11</java.version>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -44,10 +41,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jruby</groupId>
-            <artifactId>jruby-complete</artifactId>
         </dependency>
     </dependencies>
 </project>

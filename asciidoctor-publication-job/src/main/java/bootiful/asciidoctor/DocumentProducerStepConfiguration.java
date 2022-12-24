@@ -2,46 +2,71 @@ package bootiful.asciidoctor;
 
 import bootiful.asciidoctor.autoconfigure.DocumentProducer;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.job.builder.FlowBuilder;
-import org.springframework.batch.core.job.flow.Flow;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.batch.core.job.flow.support.SimpleFlow;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.AutowireCandidateQualifier;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
+import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.PlatformTransactionManager;
 
-@Log4j2
+@Slf4j
 @Configuration
-@RequiredArgsConstructor
 class DocumentProducerStepConfiguration {
 
+	// todo this will probably need to be revisited in the light of the AOT engine.
 	@Bean
-	static BeanFactoryPostProcessor flowRegisteringBeanFactoryPostProcessor() {
-		return beans -> {
-			var listableBeanFactory = (DefaultListableBeanFactory) beans;
-			var beanNamesForType = beans.getBeanNamesForType(DocumentProducer.class);
-			for (var beanName : beanNamesForType) {
-				var beanDefinition = BeanDefinitionBuilder
-						.genericBeanDefinition(Flow.class, () -> buildFlow(listableBeanFactory, beanName))
-						.getBeanDefinition();
-				beanDefinition.addQualifier(new AutowireCandidateQualifier(DocumentProducerFlow.class));
-				listableBeanFactory.registerBeanDefinition(beanName + "FlowRegistration", beanDefinition);
-			}
-		};
+	static BeanDefinitionRegistryPostProcessor flowRegisteringBeanDefinitionRegistryPostProcessor() {
+		return new DocumentProducerBeanDefinitionRegistryPostProcessor();
 	}
 
-	private static Flow buildFlow(DefaultListableBeanFactory listableBeanFactory, String beanName) {
-		var sbf = listableBeanFactory.getBean(StepBuilderFactory.class);
-		var props = listableBeanFactory.getBean(PipelineJobProperties.class);
-		var documentProducer = listableBeanFactory.getBean(beanName, DocumentProducer.class);
-		var dpt = new DocumentProducerTasklet(documentProducer, props.getTarget());
-		return new FlowBuilder<Flow>(beanName + "Flow")//
-				.start(sbf //
-						.get(beanName + DocumentProducer.class.getSimpleName() + "Step")//
-						.tasklet(dpt) //
+	static class DocumentProducerBeanDefinitionRegistryPostProcessor implements BeanDefinitionRegistryPostProcessor {
+
+		@Override
+		public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry bdr) throws BeansException {
+			log.warn("postProcessBeanDefinitionRegistry");
+
+			if (bdr instanceof ConfigurableListableBeanFactory beans) {
+				log.warn("postProcessBeanDefinitionRegistry is a " + ConfigurableListableBeanFactory.class.getName());
+				var beanNamesForType = beans.getBeanNamesForType(DocumentProducer.class);
+				for (var beanName : beanNamesForType) {
+					var beanFlowRegistrationBeanName = beanName + "FlowRegistration";
+					var bd = new RootBeanDefinition(SimpleFlow.class, () -> buildFlow(beans, beanName));
+					bd.addQualifier(new AutowireCandidateQualifier(DocumentProducerFlow.class));
+					if (!beans.containsBean(beanFlowRegistrationBeanName)) {
+						bdr.registerBeanDefinition(beanFlowRegistrationBeanName, bd);
+					}
+				}
+			}
+
+		}
+
+		@Override
+		public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+			log.warn("postProcessBeanFactory");
+		}
+
+	}
+
+	// this method is called in the supplier for the object, which is why its ok to work
+	// with references to the other beans
+	private static SimpleFlow buildFlow(BeanFactory beans, String beanName) {
+		var props = beans.getBean(PipelineJobProperties.class);
+		var documentProducer = beans.getBean(beanName, DocumentProducer.class);
+		var jr = beans.getBean(JobRepository.class);
+		var platformTransactionManager = beans.getBean(PlatformTransactionManager.class);
+		var dpt = new DocumentProducerTasklet(documentProducer, props.target());
+		return new FlowBuilder<SimpleFlow>(beanName + "Flow")//
+				.start(new StepBuilder(beanName + DocumentProducer.class.getSimpleName() + "Step", jr)//
+						.tasklet(dpt, platformTransactionManager) //
 						.build() //
 				) //
 				.build();
