@@ -50,4 +50,4 @@ jobs:
         run:  java --version  && javac --version
 
       - name: build and run
-        run:  mvn -DskipTests -f pom.xml clean deploy
+        run:  mvn -f pom.xml clean deploy
