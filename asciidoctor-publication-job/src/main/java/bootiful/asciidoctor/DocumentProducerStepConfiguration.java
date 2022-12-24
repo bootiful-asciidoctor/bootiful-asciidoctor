@@ -20,7 +20,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Slf4j
 @Configuration
-@RequiredArgsConstructor
 class DocumentProducerStepConfiguration {
 
 	// todo this will probably need to be revisited in the light of the AOT engine.
