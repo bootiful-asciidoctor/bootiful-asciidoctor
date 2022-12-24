@@ -1,42 +1,53 @@
-name: CI
+name: Bootiful Asciidoctor Autoconfiguration CI Job
 
 env:
   ARTIFACTORY_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
   ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_REGION: ${{ secrets.AWS_REGION }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  KINDLEGEN: /home/runner/bin/kindlegen/kindlegen
+  # useful to demonstrate the git branch document producer
   GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
   GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
-  KINDLEGEN: /home/runner/bin/kindlegen/kindlegen
   GIT_ARTIFACT_BRANCH: ${{ secrets.GIT_ARTIFACT_BRANCH }}
   GIT_REPOSITORY_URI: ${{ secrets.GIT_REPOSITORY_URI }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
 
 on:
-  repository_dispatch:
-    types: update-event
   push:
-    branches: [ master ]
+    branches:
+      - "*"
   pull_request:
-    branches: [ master ]
+    branches: 
+      - "master"
 
 jobs:
 
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up JDK 15
-        uses: actions/setup-java@v1
+
+      - name: configure Kindlegen directory
+        run: mkdir -p $(dirname $KINDLEGEN ) && ls -la $(dirname $KINDLEGEN)
+
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
         with:
-          java-version: 15
+          distribution: "adopt"
+          java-version: 17
+          java-package: jdk
 
       - name: Cache Maven packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-m2
           restore-keys: ${{ runner.os }}-m2
 
-      - name: build
+      - name: java versions
+        run:  java --version  && javac --version
+
+      - name: build and run
         run:  mvn -f pom.xml clean deploy
