@@ -1,4 +1,4 @@
-name: CI
+name: Bootiful Asciidoctor Autoconfiguration CI Job
 
 env:
   ARTIFACTORY_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
