@@ -14,7 +14,7 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_REGION: ${{ secrets.AWS_REGION }}
 
-on: [push]
+on: [ push ]
 
 jobs:
 
@@ -42,7 +42,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: java versions
-        run:  java --version && javac --version
+        run: java --version && javac --version
 
       - name: build and run
-        run:  mvn -f pom.xml clean deploy
+        run: mvn -f pom.xml clean deploy

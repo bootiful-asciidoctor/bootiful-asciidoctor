@@ -12,7 +12,6 @@ import org.eclipse.jgit.transport.SshSessionFactory;
  * or, better, {@link com.joshlong.git.GitUtils#createSshTransportConfigCallback(String)}
  * for some easy factory methods to build a bean of type {@link TransportConfigCallback}
  * which this class will need to authenticate when doing the {@code git push}
- *
  */
 @RequiredArgsConstructor
 public class TransportConfigCallbackGitPushCallback implements GitPushCallback {

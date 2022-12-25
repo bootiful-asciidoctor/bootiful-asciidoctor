@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -24,7 +24,6 @@
     <modules>
         <module>asciidoctor-autoconfiguration</module>
         <module>asciidoctor-publication-job</module>
-        <!--        <module>app</module>-->
     </modules>
     <dependencyManagement>
         <dependencies>
@@ -35,9 +34,14 @@
             </dependency>
             <dependency>
                 <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk</artifactId>
+                <artifactId>aws-java-sdk-s3</artifactId>
                 <version>${aws-java-sdk.version}</version>
             </dependency>
+            <!--            <dependency>
+                            <groupId>com.amazonaws</groupId>
+                            <artifactId>aws-java-sdk</artifactId>
+                            <version>${aws-java-sdk.version}</version>
+                        </dependency>-->
             <dependency>
                 <groupId>com.amazonaws</groupId>
                 <artifactId>aws-java-sdk-sts</artifactId>
@@ -87,12 +91,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-
-
-
-
-
             <plugin>
                 <groupId>org.jfrog.buildinfo</groupId>
                 <artifactId>artifactory-maven-plugin</artifactId>

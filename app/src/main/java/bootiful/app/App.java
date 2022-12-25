@@ -26,64 +26,64 @@ import java.util.List;
 @SpringBootApplication
 public class App {
 
-	public static void main(String[] args) {
-		SpringApplication.run(App.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(App.class, args);
+    }
 
-	@Bean
-	UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider(@Value("${GIT_USERNAME}") String user,
-			@Value("${GIT_PASSWORD}") String pw) {
-		return new UsernamePasswordCredentialsProvider(user, pw);
-	}
+    @Bean
+    UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider(@Value("${GIT_USERNAME}") String user,
+                                                                            @Value("${GIT_PASSWORD}") String pw) {
+        return new UsernamePasswordCredentialsProvider(user, pw);
+    }
 
-	@Bean
-	ApplicationListener<DocumentsPublishedEvent> documentsPublishedListener() {
-		return event -> event.getSource().forEach((key, value) -> log.info("file " + key + " is ready: " + value));
-	}
+    @Bean
+    ApplicationListener<DocumentsPublishedEvent> documentsPublishedListener() {
+        return event -> event.getSource().forEach((key, value) -> log.info("file " + key + " is ready: " + value));
+    }
 
-	@Bean
-	ApplicationListener<ApplicationReadyEvent> applicationReadyListener(Environment environment) {
-		return event -> List.of("pipeline.job.root", "publication.root", "publication.code")
-				.forEach(propertyName -> log.debug(propertyName + '=' + environment.getProperty(propertyName)));
-	}
+    @Bean
+    ApplicationListener<ApplicationReadyEvent> applicationReadyListener(Environment environment) {
+        return event -> List.of("pipeline.job.root", "publication.root", "publication.code")
+                .forEach(propertyName -> log.debug(propertyName + '=' + environment.getProperty(propertyName)));
+    }
 
-	@Bean
-	ApplicationListener<JobExecutionEvent> batchListener() {
-		return event -> {
-			var jobExecution = event.getJobExecution();
-			var createTime = jobExecution.getCreateTime();
-			var endTime = jobExecution.getEndTime();
-			var jobName = jobExecution.getJobInstance().getJobName();
-			log.info("job (" + jobName + ") start time: " + createTime);
-			log.info("job (" + jobName + ") stop time: " + endTime);
-		};
-	}
+    @Bean
+    ApplicationListener<JobExecutionEvent> batchListener() {
+        return event -> {
+            var jobExecution = event.getJobExecution();
+            var createTime = jobExecution.getCreateTime();
+            var endTime = jobExecution.getEndTime();
+            var jobName = jobExecution.getJobInstance().getJobName();
+            log.info("job (" + jobName + ") start time: " + createTime);
+            log.info("job (" + jobName + ") stop time: " + endTime);
+        };
+    }
 
-	static class Hints implements RuntimeHintsRegistrar {
+    static class Hints implements RuntimeHintsRegistrar {
 
-		@Override
-		public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
+        @Override
+        public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
 
-			// var natives = new String[] { "java.lang.invoke.MethodHandleNatives" };
-			// for (var c : natives)
-			// hints.jni().registerType(TypeReference.of(c), MemberCategory.values());
+            // var natives = new String[] { "java.lang.invoke.MethodHandleNatives" };
+            // for (var c : natives)
+            // hints.jni().registerType(TypeReference.of(c), MemberCategory.values());
 
-			var reflection = new Class[] { LoggerFactory.class, StandardErrorLogger.class, };
-			for (var c : reflection)
-				hints.reflection().registerType(c, MemberCategory.values());
+            var reflection = new Class[]{LoggerFactory.class, StandardErrorLogger.class,};
+            for (var c : reflection)
+                hints.reflection().registerType(c, MemberCategory.values());
 
-			var serialization = new String[] { "java.io.File[]", "java.lang.String", "java.util.Arrays$ArrayList",
-					"java.util.HashMap", "java.util.concurrent.ConcurrentHashMap",
-					"java.util.concurrent.ConcurrentHashMap$Segment",
-					"java.util.concurrent.ConcurrentHashMap$Segment[]",
-					"java.util.concurrent.locks.AbstractOwnableSynchronizer",
-					"java.util.concurrent.locks.AbstractQueuedSynchronizer", "java.util.concurrent.locks.ReentrantLock",
-					"java.util.concurrent.locks.ReentrantLock$NonfairSync",
-					"java.util.concurrent.locks.ReentrantLock$Sync.clas" };
-			for (var c : serialization)
-				hints.serialization().registerType(TypeReference.of(c));
-		}
+            var serialization = new String[]{"java.io.File[]", "java.lang.String", "java.util.Arrays$ArrayList",
+                    "java.util.HashMap", "java.util.concurrent.ConcurrentHashMap",
+                    "java.util.concurrent.ConcurrentHashMap$Segment",
+                    "java.util.concurrent.ConcurrentHashMap$Segment[]",
+                    "java.util.concurrent.locks.AbstractOwnableSynchronizer",
+                    "java.util.concurrent.locks.AbstractQueuedSynchronizer", "java.util.concurrent.locks.ReentrantLock",
+                    "java.util.concurrent.locks.ReentrantLock$NonfairSync",
+                    "java.util.concurrent.locks.ReentrantLock$Sync.clas"};
+            for (var c : serialization)
+                hints.serialization().registerType(TypeReference.of(c));
+        }
 
-	}
+    }
 
 }

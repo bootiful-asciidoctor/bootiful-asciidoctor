@@ -16,15 +16,6 @@ abstract class AbstractPdfProducer implements DocumentProducer {
 
 	// https://asciidoctor.org/docs/asciidoctor-pdf/#optimizing-the-generated-pdf
 
-	public enum PdfOptimizerQuality {
-
-		STANDARD, SCREEN, EBOOK, PRINTER, PREPRESS
-
-	}
-
-	public record PdfProducerConfiguration(PdfOptimizerQuality pdfOptimizerQuality, boolean optimize, String media) {
-	}
-
 	protected AbstractPdfProducer(PublicationProperties properties, Asciidoctor asciidoctor) {
 		this.properties = properties;
 		this.asciidoctor = asciidoctor;
@@ -69,15 +60,29 @@ abstract class AbstractPdfProducer implements DocumentProducer {
 				.attribute("pdf-fontsdir", pdf.fonts().getAbsolutePath());
 
 		if (this.getPdfProducerConfiguration().optimize()) {
-			PdfOptimizerQuality pdfOptimizerQuality = this.getPdfProducerConfiguration().pdfOptimizerQuality();
+			var pdfOptimizerQuality = this.getPdfProducerConfiguration().pdfOptimizerQuality();
 			log.debug("optimize value = " + pdfOptimizerQuality.toString().toLowerCase());
 			attributesBuilder.attribute("optimize", pdfOptimizerQuality.toString().toLowerCase());
 		}
 
 		var optionsBuilder = this.buildCommonOptions("pdf", attributesBuilder.build()).docType("book").toFile(file);
-		asciidoctor.convertFile(this.getIndexAdoc(this.properties.root()), optionsBuilder.build());
+		try {
+			asciidoctor.convertFile(this.getIndexAdoc(this.properties.root()), optionsBuilder.build());
+		}
+		catch (RuntimeException exception) {
+			Assert.state(false, exception.getMessage());
+		}
 		log.info("inside " + this.getClass().getName() + " & just created " + file.getAbsolutePath() + '.');
 		return file;
+	}
+
+	public enum PdfOptimizerQuality {
+
+		STANDARD, SCREEN, EBOOK, PRINTER, PREPRESS
+
+	}
+
+	public record PdfProducerConfiguration(PdfOptimizerQuality pdfOptimizerQuality, boolean optimize, String media) {
 	}
 
 }

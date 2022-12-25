@@ -42,6 +42,7 @@ pipeline.job.include-repositories=\
   https://github.com/reactive-spring-book/io.git,\
   https://github.com/reactive-spring-book/data.git
 ----
+
 <1> The first configuration value is the name of the book.
 That's used a _ton_ so make sure to specify it.
 <2> `pipeline.job.root` specifies where to clone all the Git repositories..

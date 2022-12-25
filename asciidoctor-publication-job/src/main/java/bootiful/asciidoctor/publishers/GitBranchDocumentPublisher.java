@@ -21,7 +21,6 @@ import java.util.Map;
  *
  * @author Josh Long
  * @author Trisha Gee
- *
  */
 @Slf4j
 class GitBranchDocumentPublisher implements DocumentPublisher {

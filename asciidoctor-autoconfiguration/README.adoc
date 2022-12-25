@@ -2,9 +2,9 @@
 
 This contains autoconfiguration to make turning a directory full of `.adoc` files into various target files (`.epub`, prepress and screen-ready `.pdf`, `.mobi`, and `.html`) as easy as possible.
 
-
 == Using this library with Spring Boot
-Unfortunately, because of the weirdness of the way JRuby works inside a `.jar`,  code that uses this library will have to add the following to the Maven configuration for the Spring Boot Maven plugin:
+
+Unfortunately, because of the weirdness of the way JRuby works inside a `.jar`, code that uses this library will have to add the following to the Maven configuration for the Spring Boot Maven plugin:
 
 [source,xml]
 ----

@@ -16,6 +16,7 @@ import static bootiful.asciidoctor.autoconfigure.FileCopyUtils.copy;
  * {@link DocumentProducer} instances as they please.
  */
 @Slf4j
+@Deprecated
 @RequiredArgsConstructor
 class DocumentProducerProcessor {
 

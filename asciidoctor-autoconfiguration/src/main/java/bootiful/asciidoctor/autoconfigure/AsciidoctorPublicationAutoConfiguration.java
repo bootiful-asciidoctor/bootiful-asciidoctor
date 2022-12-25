@@ -27,8 +27,8 @@ class AsciidoctorPublicationAutoConfiguration {
 	/**
 	 * this only works if you've opted into it <em>and</em> you're running on Linux
 	 */
-	@ConditionalOnProperty(value = "publication.mobi.enabled", havingValue = "true", matchIfMissing = false)
 	@Bean
+	@ConditionalOnProperty(value = "publication.mobi.enabled", havingValue = "true", matchIfMissing = false)
 	DocumentProducer mobiProducer(PublicationProperties pp, @Value("classpath:/kindlegen") Resource kindlegen,
 			Asciidoctor asciidoctor) {
 		Assert.isTrue(System.getProperty("os.name").toLowerCase().contains("linux"),
@@ -37,14 +37,14 @@ class AsciidoctorPublicationAutoConfiguration {
 
 	}
 
-	@ConditionalOnProperty(value = "publication.html.enabled", havingValue = "true", matchIfMissing = true)
 	@Bean
+	@ConditionalOnProperty(value = "publication.html.enabled", havingValue = "true", matchIfMissing = true)
 	DocumentProducer htmlProducer(PublicationProperties pp, Asciidoctor asciidoctor) {
 		return new HtmlProducer(pp, asciidoctor);
 	}
 
-	@ConditionalOnProperty(value = "publication.pdf.screen.enabled", havingValue = "true", matchIfMissing = true)
 	@Bean
+	@ConditionalOnProperty(value = "publication.pdf.screen.enabled", havingValue = "true", matchIfMissing = true)
 	DocumentProducer screenPdfProducer(PublicationProperties pp, Asciidoctor asciidoctor) {
 		return new ScreenPdfProducer(pp, asciidoctor);
 	}
@@ -63,23 +63,3 @@ class AsciidoctorPublicationAutoConfiguration {
 	}
 
 }
-/*
- *
- * @Slf4j
- *
- * @RequiredArgsConstructor class EnabledDelegatingDocumentProducer implements
- * DocumentProducer {
- *
- * private final Supplier<DocumentProducer> dp;
- *
- * private final String name;
- *
- * private final boolean enabled;
- *
- * @Override public File[] produce() throws Exception { if (!this.enabled) { if
- * (log.isDebugEnabled()) log.debug("not running " + name + " as it is not enabled.");
- * return new File[0]; } log.info("running " + this.name); return this.dp.get().produce();
- * }
- *
- * }
- */

@@ -40,7 +40,6 @@ class GitCloneDocsStepConfiguration {
 	Step gitCloneDocsStep() {
 		return new StepBuilder("gitCloneDocsStep", this.jobRepository) //
 				.tasklet((stepContribution, chunkContext) -> {
-					log.info("going to clone");
 					var docs = FileUtils.getDocsDirectory(pipelineJobProperties.root());
 					FileUtils.resetOrRecreateDirectory(docs);
 					var docsUri = URI.create(pipelineJobProperties.documentRepository().trim());

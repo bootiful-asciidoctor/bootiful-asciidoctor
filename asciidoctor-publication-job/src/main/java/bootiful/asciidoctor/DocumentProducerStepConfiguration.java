@@ -1,7 +1,6 @@
 package bootiful.asciidoctor;
 
 import bootiful.asciidoctor.autoconfigure.DocumentProducer;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.flow.support.SimpleFlow;
@@ -26,6 +25,22 @@ class DocumentProducerStepConfiguration {
 	@Bean
 	static BeanDefinitionRegistryPostProcessor flowRegisteringBeanDefinitionRegistryPostProcessor() {
 		return new DocumentProducerBeanDefinitionRegistryPostProcessor();
+	}
+
+	// this method is called in the supplier for the object, which is why its ok to work
+	// with references to the other beans
+	private static SimpleFlow buildFlow(BeanFactory beans, String beanName) {
+		var props = beans.getBean(PipelineJobProperties.class);
+		var documentProducer = beans.getBean(beanName, DocumentProducer.class);
+		var jr = beans.getBean(JobRepository.class);
+		var platformTransactionManager = beans.getBean(PlatformTransactionManager.class);
+		var dpt = new DocumentProducerTasklet(documentProducer, props.target());
+		return new FlowBuilder<SimpleFlow>(beanName + "Flow")//
+				.start(new StepBuilder(beanName + DocumentProducer.class.getSimpleName() + "Step", jr)//
+						.tasklet(dpt, platformTransactionManager) //
+						.build() //
+				) //
+				.build();
 	}
 
 	static class DocumentProducerBeanDefinitionRegistryPostProcessor implements BeanDefinitionRegistryPostProcessor {
@@ -54,22 +69,6 @@ class DocumentProducerStepConfiguration {
 			log.warn("postProcessBeanFactory");
 		}
 
-	}
-
-	// this method is called in the supplier for the object, which is why its ok to work
-	// with references to the other beans
-	private static SimpleFlow buildFlow(BeanFactory beans, String beanName) {
-		var props = beans.getBean(PipelineJobProperties.class);
-		var documentProducer = beans.getBean(beanName, DocumentProducer.class);
-		var jr = beans.getBean(JobRepository.class);
-		var platformTransactionManager = beans.getBean(PlatformTransactionManager.class);
-		var dpt = new DocumentProducerTasklet(documentProducer, props.target());
-		return new FlowBuilder<SimpleFlow>(beanName + "Flow")//
-				.start(new StepBuilder(beanName + DocumentProducer.class.getSimpleName() + "Step", jr)//
-						.tasklet(dpt, platformTransactionManager) //
-						.build() //
-				) //
-				.build();
 	}
 
 }

@@ -24,7 +24,7 @@ public abstract class FileCopyUtils {
 	}
 
 	public static void copy(File src, File dst) {
-		log.info("copying " + src.getAbsolutePath() + " to " + dst.getAbsolutePath());
+		log.debug("copying " + src.getAbsolutePath() + " to " + dst.getAbsolutePath());
 		if (src.isDirectory()) {
 			Assert.isTrue(dst.exists() || dst.mkdirs(),
 					dst.getAbsolutePath() + " does not exist and couldn't be created");
