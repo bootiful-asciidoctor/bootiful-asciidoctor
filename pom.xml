@@ -88,6 +88,11 @@
                 </executions>
             </plugin>
 
+
+
+
+
+
             <plugin>
                 <groupId>org.jfrog.buildinfo</groupId>
                 <artifactId>artifactory-maven-plugin</artifactId>
@@ -105,7 +110,6 @@
                                 </build.vcsRevision>
                             </deployProperties>
                             <publisher>
-
                                 <contextUrl>
                                     https://cloudnativejava.jfrog.io/cloudnativejava
                                 </contextUrl>
@@ -117,7 +121,12 @@
                             </publisher>
                             <buildInfo>
                                 <agentName>Github Actions</agentName>
-                                <buildNumber>{{GITHUB_RUN_ID}} </buildNumber>
+                                <buildNumber>
+                                    {{GITHUB_RUN_ID}}
+                                </buildNumber>
+                                <buildUrl>
+                                    https://github.com/{{GITHUB_REPOSITORY}}/actions/runs/{{GITHUB_RUN_ID}}
+                                </buildUrl>
                                 <principal>{{USER}}</principal>
                                 <vcsRevision>{{GITHUB_SHA}}</vcsRevision>
                             </buildInfo>
@@ -125,6 +134,7 @@
                     </execution>
                 </executions>
             </plugin>
+
         </plugins>
     </build>
     <repositories>
