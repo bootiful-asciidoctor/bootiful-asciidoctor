@@ -19,4 +19,9 @@ class PrepressPdfProducer extends AbstractPdfProducer {
 		return this.configuration;
 	}
 
+	@Override
+	public String getType() {
+		return "prepress-pdf";
+	}
+
 }

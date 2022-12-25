@@ -40,7 +40,7 @@ class DocumentProducerProcessor {
 	}
 
 	private void collectOutputFiles(DocumentProducer producer, Stream<File> files) {
-		var name = producer.getClass().getSimpleName().toLowerCase().replace("producer", "");
+		var name = producer.getType();
 		var target = new File(this.properties.target(), name);
 		Assert.isTrue(target.exists() || target.mkdirs(),
 				"the target directory " + target.getAbsolutePath() + " does not exist and couldn't be created");

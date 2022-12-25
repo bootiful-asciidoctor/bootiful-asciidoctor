@@ -19,4 +19,9 @@ class ScreenPdfProducer extends AbstractPdfProducer {
 		return this.configuration;
 	}
 
+	@Override
+	public String getType() {
+		return "screen-pdf";
+	}
+
 }

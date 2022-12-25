@@ -10,6 +10,11 @@ import java.io.File;
 @RequiredArgsConstructor
 class HtmlProducer implements DocumentProducer {
 
+	@Override
+	public String getType() {
+		return "html";
+	}
+
 	private final PublicationProperties properties;
 
 	private final Asciidoctor asciidoctor;

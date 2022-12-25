@@ -88,6 +88,11 @@ class EnabledDelegatingDocumentProducer implements DocumentProducer {
 	private final boolean enabled;
 
 	@Override
+	public String getType() {
+		return this.dp.get().getType();
+	}
+
+	@Override
 	public File[] produce() throws Exception {
 		if (!this.enabled) {
 			if (log.isDebugEnabled())

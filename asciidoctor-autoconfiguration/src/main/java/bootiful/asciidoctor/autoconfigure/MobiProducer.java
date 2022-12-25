@@ -65,6 +65,11 @@ class MobiProducer implements DocumentProducer {
 		return bf;
 	}
 
+	@Override
+	public String getType() {
+		return "mobi";
+	}
+
 	@SneakyThrows
 	private void installKindlegen() {
 		var binaryLocation = binaryLocationForKindlegen(
