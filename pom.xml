@@ -91,45 +91,47 @@
                 <groupId>org.jfrog.buildinfo</groupId>
                 <artifactId>artifactory-maven-plugin</artifactId>
                 <version>3.4.0</version>
-                <inherited>false</inherited>
-                <executions>
-                    <execution>
-                        <id>build-info</id>
-                        <goals>
-                            <goal>publish</goal>
-                        </goals>
-                        <configuration>
-                            <deployProperties>
-                                <build.vcsRevision>
-                                    {{GITHUB_SHA}}
-                                </build.vcsRevision>
-                            </deployProperties>
-                            <publisher>
-                                <contextUrl>
-                                    https://cloudnativejava.jfrog.io/cloudnativejava
-                                </contextUrl>
-                                <username>${env.ARTIFACTORY_USERNAME}</username>
-                                <password>${env.ARTIFACTORY_PASSWORD}</password>
-                                <repoKey>libs-release-local</repoKey>
-                                <snapshotRepoKey>libs-snapshot-local
-                                </snapshotRepoKey>
-                            </publisher>
-                            <buildInfo>
-                                <agentName>Github Actions</agentName>
-                                <buildNumber>{{GITHUB_RUN_ID}}
-                                </buildNumber>
-                                <buildUrl>
-                                    http://travis-ci.org/{{GITHUB_REPOSITORY}}/builds/{{GITHUB_RUN_ID}}
-                                </buildUrl>
-                                <principal>{{USER}}</principal>
-                                <vcsRevision>{{GITHUB_SHA}}</vcsRevision>
-                            </buildInfo>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
+
+
         </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.jfrog.buildinfo</groupId>
+                    <artifactId>artifactory-maven-plugin</artifactId>
+                    <version>3.4.0</version>
+                    <inherited>true</inherited>
+                    <executions>
+                        <execution>
+                            <id>build-info</id>
+                            <goals>
+                                <goal>publish</goal>
+                            </goals>
+                            <configuration>
+                                <buildInfo>
+                                    <buildNumber>{{GITHUB_SHA}}</buildNumber>
+                                    <buildUrl>{{BUILD_URL}}</buildUrl>
+                                </buildInfo>
+                                <deployProperties>
+                                    <build.vcsRevision>{{GITHUB_SHA}}</build.vcsRevision>
+                                </deployProperties>
+                                <publisher>
+                                    <contextUrl>https://cloudnativejava.jfrog.io/cloudnativejava</contextUrl>
+                                    <username>${env.ARTIFACTORY_USERNAME}</username>
+                                    <password>${env.ARTIFACTORY_PASSWORD}</password>
+                                    <repoKey>libs-release-local</repoKey>
+                                    <snapshotRepoKey>libs-snapshot-local</snapshotRepoKey>
+                                </publisher>
+
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
+
     <repositories>
         <repository>
             <snapshots>
