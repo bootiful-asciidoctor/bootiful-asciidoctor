@@ -67,7 +67,9 @@ class MobiProducer implements DocumentProducer {
 
 	@SneakyThrows
 	private void installKindlegen() {
-		var binaryLocation = binaryLocationForKindlegen(this.properties.mobi().kindlegen().binaryLocation());
+		var binaryLocation = binaryLocationForKindlegen(
+				this.properties.mobi() != null && this.properties.mobi().kindlegen() != null
+						? this.properties.mobi().kindlegen().binaryLocation() : null);
 		var directoryForKindlegen = binaryLocation.getParentFile();
 		if (!directoryForKindlegen.exists()) {
 			directoryForKindlegen.mkdirs();

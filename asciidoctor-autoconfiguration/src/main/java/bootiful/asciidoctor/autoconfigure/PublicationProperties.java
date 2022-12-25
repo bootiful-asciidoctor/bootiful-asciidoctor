@@ -4,7 +4,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.io.File;
 
-// todo convert all of these into records
 @ConfigurationProperties("publication")
 public record PublicationProperties(File root, File target, File code, String bookName, Runner runner, Html html,
 		Pdf pdf, Epub epub, Mobi mobi) {
