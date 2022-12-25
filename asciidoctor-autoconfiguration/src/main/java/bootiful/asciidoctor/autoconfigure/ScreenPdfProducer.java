@@ -12,16 +12,12 @@ class ScreenPdfProducer extends AbstractPdfProducer {
 		var mediaConfig = pdf.screen();
 		this.configuration = new PdfProducerConfiguration(mediaConfig.quality(), mediaConfig.optimize(),
 				mediaConfig.media());
+
 	}
 
 	@Override
 	protected PdfProducerConfiguration getPdfProducerConfiguration() {
 		return this.configuration;
-	}
-
-	@Override
-	public String getType() {
-		return "screen-pdf";
 	}
 
 }

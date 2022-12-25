@@ -8,11 +8,6 @@ import java.io.File;
 @RequiredArgsConstructor
 class EpubProducer implements DocumentProducer {
 
-	@Override
-	public String getType() {
-		return "epub";
-	}
-
 	private final PublicationProperties properties;
 
 	private final Asciidoctor asciidoctor;

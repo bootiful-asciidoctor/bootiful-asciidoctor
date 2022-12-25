@@ -6,10 +6,6 @@ import java.io.File;
 
 public interface DocumentProducer {
 
-	default String getType() {
-		return this.getClass().getSimpleName().toLowerCase().replace("producer", "");
-	}
-
 	default OptionsBuilder buildCommonOptions(String backend) {
 		return Options.builder().safe(SafeMode.UNSAFE).backend(backend).inPlace(false);
 	}

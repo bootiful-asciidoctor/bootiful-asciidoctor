@@ -7,9 +7,11 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
+import org.springframework.util.Assert;
 
 import java.io.File;
 import java.util.function.Supplier;
@@ -33,32 +35,32 @@ class AsciidoctorPublicationAutoConfiguration {
 	/**
 	 * this only works if you've opted into it <em>and</em> you're running on Linux
 	 */
+	@ConditionalOnProperty(value = "publication.mobi.enabled", havingValue = "true", matchIfMissing = false)
 	@Bean
 	DocumentProducer mobiProducer(PublicationProperties pp, @Value("classpath:/kindlegen") Resource kindlegen,
 			Asciidoctor asciidoctor) {
-		var linux = System.getProperty("os.name").toLowerCase().contains("linux");
-		return new EnabledDelegatingDocumentProducer(() -> new MobiProducer(pp, asciidoctor, kindlegen),
-				nameFor(MobiProducer.class), linux && pp.mobi() != null && pp.mobi().enabled());
+		Assert.isTrue(System.getProperty("os.name").toLowerCase().contains("linux"),
+				"this needs to be running on Linux");
+		return new MobiProducer(pp, asciidoctor, kindlegen);
+
 	}
 
+	@ConditionalOnProperty(value = "publication.html.enabled", havingValue = "true", matchIfMissing = true)
 	@Bean
 	DocumentProducer htmlProducer(PublicationProperties pp, Asciidoctor asciidoctor) {
-		return new EnabledDelegatingDocumentProducer(() -> new HtmlProducer(pp, asciidoctor),
-				nameFor(HtmlProducer.class), pp.html() != null && pp.html().enabled());
+		return new HtmlProducer(pp, asciidoctor);
 	}
 
+	@ConditionalOnProperty(value = "publication.pdf.screen.enabled", havingValue = "true", matchIfMissing = true)
 	@Bean
 	DocumentProducer screenPdfProducer(PublicationProperties pp, Asciidoctor asciidoctor) {
-		return new EnabledDelegatingDocumentProducer(() -> new ScreenPdfProducer(pp, asciidoctor),
-				nameFor(ScreenPdfProducer.class),
-				pp.pdf() != null && pp.pdf().screen() != null && pp.pdf().screen().enabled());
+		return new ScreenPdfProducer(pp, asciidoctor);
 	}
 
 	@Bean
+	@ConditionalOnProperty(value = "publication.pdf.prepress.enabled", havingValue = "true", matchIfMissing = true)
 	DocumentProducer prepressPdfProducer(PublicationProperties pp, Asciidoctor asciidoctor) {
-		return new EnabledDelegatingDocumentProducer(() -> new PrepressPdfProducer(pp, asciidoctor),
-				nameFor(PrepressPdfProducer.class),
-				pp.pdf() != null && pp.pdf().prepress() != null && pp.pdf().prepress().enabled());
+		return new PrepressPdfProducer(pp, asciidoctor);
 	}
 	/*
 	 * @Bean DocumentProducerProcessor
@@ -86,11 +88,6 @@ class EnabledDelegatingDocumentProducer implements DocumentProducer {
 	private final String name;
 
 	private final boolean enabled;
-
-	@Override
-	public String getType() {
-		return this.dp.get().getType();
-	}
 
 	@Override
 	public File[] produce() throws Exception {
