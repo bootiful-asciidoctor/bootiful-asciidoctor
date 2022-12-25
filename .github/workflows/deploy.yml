@@ -45,4 +45,4 @@ jobs:
         run:  java --version && javac --version
 
       - name: build and run
-        run:  mvn -f pom.xml clean package
+        run:  mvn -f pom.xml clean deploy
