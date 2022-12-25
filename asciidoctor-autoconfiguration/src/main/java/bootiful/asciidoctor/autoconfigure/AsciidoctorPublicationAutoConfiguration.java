@@ -60,13 +60,13 @@ class AsciidoctorPublicationAutoConfiguration {
 				nameFor(PrepressPdfProducer.class),
 				pp.pdf() != null && pp.pdf().prepress() != null && pp.pdf().prepress().enabled());
 	}
-
-	@Bean
-	DocumentProducerProcessor documentProducerProcessor(ObjectProvider<DocumentProducer> dps,
-			PublicationProperties pp) {
-		var array = dps.stream().toArray(DocumentProducer[]::new);
-		return new DocumentProducerProcessor(array, pp);
-	}
+	/*
+	 * @Bean DocumentProducerProcessor
+	 * documentProducerProcessor(ObjectProvider<DocumentProducer> dps,
+	 * PublicationProperties pp) { var array =
+	 * dps.stream().toArray(DocumentProducer[]::new); return new
+	 * DocumentProducerProcessor(array, pp); }
+	 */
 
 	@Bean
 	Asciidoctor asciidoctor(ObjectProvider<AsciidoctorCustomizer> customizers) {

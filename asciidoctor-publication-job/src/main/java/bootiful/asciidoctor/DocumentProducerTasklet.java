@@ -51,7 +51,7 @@ class DocumentProducerTasklet implements Tasklet {
 			executionContext.put("files", new ConcurrentHashMap<String, List<File>>());
 		}
 		var files = Objects.requireNonNull((Map<String, List<File>>) executionContext.get("files"));
-		files.put(this.documentProducer.getClass().getSimpleName(), Arrays.asList(fileArray));
+		files.put(this.documentProducer.getType(), Arrays.asList(fileArray));
 	}
 
 	@SneakyThrows
