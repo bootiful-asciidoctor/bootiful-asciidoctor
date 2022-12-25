@@ -1,4 +1,5 @@
-name: Bootiful Asciidoctor Autoconfiguration CI Job
+name: Bootiful Asciidoctor
+run-name: ${{ github.actor }} updated the pipeline engine code
 
 env:
   ARTIFACTORY_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
@@ -13,17 +14,11 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_REGION: ${{ secrets.AWS_REGION }}
 
-on:
-  push:
-    branches:
-      - "*"
-  pull_request:
-    branches: 
-      - "master"
+on: [push]
 
 jobs:
 
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
 
