@@ -47,7 +47,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: java versions
-        run:  java --version  && javac --version
+        run:  java --version && javac --version
 
       - name: build and run
         run:  mvn -f pom.xml clean package
