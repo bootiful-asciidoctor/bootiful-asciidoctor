@@ -1,6 +1,5 @@
 package bootiful.asciidoctor.autoconfigure;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.asciidoctor.Asciidoctor;
 import org.springframework.beans.factory.ObjectProvider;
@@ -13,23 +12,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
-import java.io.File;
-import java.util.function.Supplier;
-
 @Slf4j
 @AutoConfiguration
 @EnableConfigurationProperties(PublicationProperties.class)
 @ConditionalOnClass(Asciidoctor.class)
 class AsciidoctorPublicationAutoConfiguration {
 
-	private static String nameFor(Class<? extends DocumentProducer> clzz) {
-		return clzz.getName();
-	}
-
 	@Bean
+	@ConditionalOnProperty(value = "publication.epub.enabled", havingValue = "true", matchIfMissing = false)
 	DocumentProducer epubProducer(PublicationProperties pp, Asciidoctor asciidoctor) {
-		return new EnabledDelegatingDocumentProducer(() -> new EpubProducer(pp, asciidoctor),
-				nameFor(EpubProducer.class), pp.epub() != null && pp.epub().enabled());
+		return new EpubProducer(pp, asciidoctor);
 	}
 
 	/**
@@ -62,13 +54,6 @@ class AsciidoctorPublicationAutoConfiguration {
 	DocumentProducer prepressPdfProducer(PublicationProperties pp, Asciidoctor asciidoctor) {
 		return new PrepressPdfProducer(pp, asciidoctor);
 	}
-	/*
-	 * @Bean DocumentProducerProcessor
-	 * documentProducerProcessor(ObjectProvider<DocumentProducer> dps,
-	 * PublicationProperties pp) { var array =
-	 * dps.stream().toArray(DocumentProducer[]::new); return new
-	 * DocumentProducerProcessor(array, pp); }
-	 */
 
 	@Bean
 	Asciidoctor asciidoctor(ObjectProvider<AsciidoctorCustomizer> customizers) {
@@ -78,26 +63,23 @@ class AsciidoctorPublicationAutoConfiguration {
 	}
 
 }
-
-@Slf4j
-@RequiredArgsConstructor
-class EnabledDelegatingDocumentProducer implements DocumentProducer {
-
-	private final Supplier<DocumentProducer> dp;
-
-	private final String name;
-
-	private final boolean enabled;
-
-	@Override
-	public File[] produce() throws Exception {
-		if (!this.enabled) {
-			if (log.isDebugEnabled())
-				log.debug("not running " + name + " as it is not enabled.");
-			return new File[0];
-		}
-		log.info("running " + this.name);
-		return this.dp.get().produce();
-	}
-
-}
+/*
+ *
+ * @Slf4j
+ *
+ * @RequiredArgsConstructor class EnabledDelegatingDocumentProducer implements
+ * DocumentProducer {
+ *
+ * private final Supplier<DocumentProducer> dp;
+ *
+ * private final String name;
+ *
+ * private final boolean enabled;
+ *
+ * @Override public File[] produce() throws Exception { if (!this.enabled) { if
+ * (log.isDebugEnabled()) log.debug("not running " + name + " as it is not enabled.");
+ * return new File[0]; } log.info("running " + this.name); return this.dp.get().produce();
+ * }
+ *
+ * }
+ */

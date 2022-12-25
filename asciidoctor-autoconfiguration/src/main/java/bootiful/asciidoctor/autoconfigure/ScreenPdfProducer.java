@@ -10,8 +10,7 @@ class ScreenPdfProducer extends AbstractPdfProducer {
 		super(properties, asciidoctor);
 		var pdf = properties.pdf();
 		var mediaConfig = pdf.screen();
-		this.configuration = new PdfProducerConfiguration(mediaConfig.quality(), mediaConfig.optimize(),
-				mediaConfig.media());
+		this.configuration = new PdfProducerConfiguration(mediaConfig.quality(), mediaConfig.optimize(), "screen");
 
 	}
 

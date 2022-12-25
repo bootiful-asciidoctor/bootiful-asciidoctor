@@ -1,9 +1,8 @@
 package bootiful.asciidoctor.autoconfigure;
 
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.asciidoctor.Asciidoctor;
+import org.springframework.util.Assert;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,16 +22,7 @@ abstract class AbstractPdfProducer implements DocumentProducer {
 
 	}
 
-	@Data
-	@RequiredArgsConstructor
-	public static class PdfProducerConfiguration {
-
-		private final PdfOptimizerQuality pdfOptimizerQuality;
-
-		private final boolean optimize;
-
-		private final String media;
-
+	public record PdfProducerConfiguration(PdfOptimizerQuality pdfOptimizerQuality, boolean optimize, String media) {
 	}
 
 	protected AbstractPdfProducer(PublicationProperties properties, Asciidoctor asciidoctor) {
@@ -48,8 +38,9 @@ abstract class AbstractPdfProducer implements DocumentProducer {
 
 	@Override
 	public File[] produce() {
-		var optimize = this.getPdfProducerConfiguration().isOptimize();
-		var media = this.getPdfProducerConfiguration().getMedia();
+		var producerConfiguration = this.getPdfProducerConfiguration();
+		var optimize = producerConfiguration.optimize();
+		var media = producerConfiguration.media();
 		var files = new ArrayList<File>();
 		var regularFile = this.producePdf(media,
 				new File(this.properties.root(), "index-" + media.toLowerCase() + ".pdf"));
@@ -77,8 +68,8 @@ abstract class AbstractPdfProducer implements DocumentProducer {
 				.attribute("pdf-stylesdir", pdf.styles().getAbsolutePath()) //
 				.attribute("pdf-fontsdir", pdf.fonts().getAbsolutePath());
 
-		if (this.getPdfProducerConfiguration().isOptimize()) {
-			PdfOptimizerQuality pdfOptimizerQuality = this.getPdfProducerConfiguration().getPdfOptimizerQuality();
+		if (this.getPdfProducerConfiguration().optimize()) {
+			PdfOptimizerQuality pdfOptimizerQuality = this.getPdfProducerConfiguration().pdfOptimizerQuality();
 			log.debug("optimize value = " + pdfOptimizerQuality.toString().toLowerCase());
 			attributesBuilder.attribute("optimize", pdfOptimizerQuality.toString().toLowerCase());
 		}

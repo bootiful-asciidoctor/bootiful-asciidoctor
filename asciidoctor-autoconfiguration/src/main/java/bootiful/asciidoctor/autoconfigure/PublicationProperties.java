@@ -15,13 +15,13 @@ public record PublicationProperties(File root, File target, File code, String bo
 	}
 
 	public record Pdf(boolean enabled, String isbn, File fonts, File styles, Prepress prepress, Screen screen) {
-		public record Prepress(boolean enabled, boolean optimize, String media) {
+		public record Prepress(boolean enabled, boolean optimize) {
 			public AbstractPdfProducer.PdfOptimizerQuality quality() {
 				return AbstractPdfProducer.PdfOptimizerQuality.PREPRESS;
 			}
 		}
 
-		public record Screen(boolean enabled, boolean optimize, String media) {
+		public record Screen(boolean enabled, boolean optimize) {
 			public AbstractPdfProducer.PdfOptimizerQuality quality() {
 				return AbstractPdfProducer.PdfOptimizerQuality.SCREEN;
 			}
