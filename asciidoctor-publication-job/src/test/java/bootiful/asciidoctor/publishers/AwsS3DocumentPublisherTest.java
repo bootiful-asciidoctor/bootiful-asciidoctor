@@ -23,7 +23,7 @@ class AwsS3DocumentPublisherTest {
 		var awsAccessKeyId = System.getenv("AWS_ACCESS_KEY_ID");
 		var region = System.getenv("AWS_REGION");
 		var secretAccessKey = System.getenv("AWS_SECRET_ACCESS_KEY");
-        var bucketName = System.getenv("AWS_BUCKET_NAME");
+		var bucketName = System.getenv("AWS_BUCKET_NAME");
 		var aws = buildAmazonS3Instance(awsAccessKeyId, secretAccessKey, region);
 		var dp = new AwsS3DocumentPublisher(aws, bucketName);
 		var epub = fileFromClassPathPath("files/epub/index.epub");
@@ -48,8 +48,7 @@ class AwsS3DocumentPublisherTest {
 		var clientConfiguration = ClientOverrideConfiguration.builder().apiCallTimeout(timeout).build();
 
 		return S3Client.builder().overrideConfiguration(clientConfiguration)
-                .credentialsProvider(StaticCredentialsProvider.create(credentials))
-				.region(Region.of(region)).build();
+				.credentialsProvider(StaticCredentialsProvider.create(credentials)).region(Region.of(region)).build();
 	}
 
 }
