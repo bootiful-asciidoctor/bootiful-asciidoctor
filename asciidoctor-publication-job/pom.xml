@@ -5,7 +5,7 @@
     <parent>
         <groupId>bootiful.asciidoctor</groupId>
         <artifactId>parent</artifactId>
-        <version>0.0.4-SNAPSHOT</version>
+        <version>0.0.5-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
     <artifactId>
@@ -13,14 +13,12 @@
     </artifactId>
     <dependencies>
         <dependency>
-            <groupId>com.amazonaws</groupId>
-            <optional>true</optional>
-            <artifactId>aws-java-sdk-s3</artifactId>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
         </dependency>
         <dependency>
-            <optional>true</optional>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-sts</artifactId>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>sts</artifactId>
         </dependency>
         <dependency>
             <groupId>com.joshlong</groupId>
@@ -44,11 +42,6 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
         <dependency>

@@ -1,7 +1,8 @@
 package bootiful.asciidoctor;
 
 import bootiful.asciidoctor.autoconfigure.DocumentProducer;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.batch.core.repository.JobRepository;
@@ -17,7 +18,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
-@Slf4j
 @Configuration
 class DocumentProducerStepConfiguration {
 
@@ -45,12 +45,15 @@ class DocumentProducerStepConfiguration {
 
 	static class DocumentProducerBeanDefinitionRegistryPostProcessor implements BeanDefinitionRegistryPostProcessor {
 
+		private static final Logger log = LoggerFactory
+				.getLogger(DocumentProducerBeanDefinitionRegistryPostProcessor.class);
+
 		@Override
 		public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry bdr) throws BeansException {
 			log.warn("postProcessBeanDefinitionRegistry");
 
 			if (bdr instanceof ConfigurableListableBeanFactory beans) {
-				log.warn("postProcessBeanDefinitionRegistry is a " + ConfigurableListableBeanFactory.class.getName());
+				log.warn("postProcessBeanDefinitionRegistry is a {}", ConfigurableListableBeanFactory.class.getName());
 				var beanNamesForType = beans.getBeanNamesForType(DocumentProducer.class);
 				for (var beanName : beanNamesForType) {
 					var beanFlowRegistrationBeanName = beanName + "FlowRegistration";

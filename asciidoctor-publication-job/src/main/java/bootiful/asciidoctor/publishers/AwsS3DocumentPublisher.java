@@ -2,15 +2,13 @@ package bootiful.asciidoctor.publishers;
 
 import bootiful.asciidoctor.DocumentPublisher;
 import bootiful.asciidoctor.files.ZipUtils;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.GetObjectRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.File;
 import java.net.URI;
@@ -20,15 +18,20 @@ import java.util.*;
 /**
  * Archives the published artifacts and writes them AWS S3
  */
-@Slf4j
-@RequiredArgsConstructor
 class AwsS3DocumentPublisher implements DocumentPublisher {
 
-	private final AmazonS3 s3;
+	private static final Logger log = LoggerFactory.getLogger(AwsS3DocumentPublisher.class);
+
+	private final S3Client s3;
 
 	private final String bucketName;
 
 	private final String contentType = "binary/octet-stream";
+
+	AwsS3DocumentPublisher(S3Client s3, String bucketName) {
+		this.s3 = s3;
+		this.bucketName = bucketName;
+	}
 
 	@Override
 	public void publish(Map<String, Collection<File>> files) throws Exception {
@@ -71,19 +74,17 @@ class AwsS3DocumentPublisher implements DocumentPublisher {
 		return sdf.format(cal.getTime());
 	}
 
-	@SneakyThrows
 	private URI upload(String bucketName, String contentType, String nestedBucketFolder, File file) {
 		if (file.length() > 0) {
-			var objectMetadata = new ObjectMetadata();
-			objectMetadata.setContentType(contentType);
-			objectMetadata.setContentLength(file.length());
-			var request = new PutObjectRequest(
-					bucketName + (nestedBucketFolder == null ? "" : "/" + nestedBucketFolder), file.getName(), file);
-			var putObjectResult = this.s3.putObject(request);
-			Assert.notNull(putObjectResult, "the S3 file hasn't been uploaded");
+			var key = (nestedBucketFolder == null ? "" : nestedBucketFolder + "/") + file.getName();
+			var putObjectRequest = PutObjectRequest.builder().bucket(bucketName).key(key).contentType(contentType)
+					.build();
+			var putObjectResponse = this.s3.putObject(putObjectRequest, file.toPath());
+			Assert.notNull(putObjectResponse, "the S3 file hasn't been uploaded");
 			var uri = this.createS3Uri(bucketName, nestedBucketFolder, file.getName());
-			log.info("uploaded the file " + file.getAbsolutePath() + " to bucket " + bucketName + " with content type "
-					+ contentType + " and nested folder " + nestedBucketFolder + ". The resulting URI is " + uri);
+			log.info(
+					"uploaded the file {} to bucket {} with content type {} and nested folder {}. The resulting URI is {}",
+					file.getAbsolutePath(), bucketName, contentType, nestedBucketFolder, uri);
 			return uri;
 		}
 		return null;
@@ -91,7 +92,7 @@ class AwsS3DocumentPublisher implements DocumentPublisher {
 
 	private URI createS3Uri(String bucketName, String nestedBucketFolder, String fileName) {
 		var uri = this.s3FqnFor(bucketName, nestedBucketFolder, fileName);
-		log.debug("the S3 FQN URI is " + uri);
+		log.debug("the S3 FQN URI is {}", uri);
 		if (null == uri) {
 			log.debug("the URI is null; returning null");
 			return null;
@@ -109,11 +110,11 @@ class AwsS3DocumentPublisher implements DocumentPublisher {
 		}
 		String key = folder + fn;
 		try {
-			var object = this.s3.getObject(new GetObjectRequest(bucket, key));
+			var object = this.s3.getObject(GetObjectRequest.builder().bucket(bucket).key(key).build());
 			Assert.notNull(object, "the fetch of the object should not be null");
 		}
 		catch (Exception e) {
-			log.warn("No object of this key name " + key + " exists in this bucket, " + bucket);
+			log.warn("No object of this key name {} exists in this bucket, {}", key, bucket);
 			return null;
 		}
 		return String.format("s3://%s/%s", bucket, key);

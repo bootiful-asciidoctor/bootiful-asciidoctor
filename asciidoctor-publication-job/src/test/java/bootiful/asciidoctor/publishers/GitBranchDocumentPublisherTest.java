@@ -2,12 +2,12 @@ package bootiful.asciidoctor.publishers;
 
 import bootiful.asciidoctor.git.CredentialsProviderGitCloneCallback;
 import bootiful.asciidoctor.git.CredentialsProviderGitPushCallback;
-import lombok.SneakyThrows;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
@@ -19,9 +19,13 @@ import java.util.Map;
  */
 class GitBranchDocumentPublisherTest {
 
-	@SneakyThrows
 	private File fileFromClassPathPath(String path) {
-		return new ClassPathResource(path).getFile();
+		try {
+			return new ClassPathResource(path).getFile();
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Test

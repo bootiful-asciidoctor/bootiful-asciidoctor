@@ -2,9 +2,8 @@ package bootiful.asciidoctor;
 
 import bootiful.asciidoctor.autoconfigure.DocumentProducer;
 import bootiful.asciidoctor.autoconfigure.FileCopyUtils;
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -17,20 +16,25 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Slf4j
-@RequiredArgsConstructor
 class DocumentProducerTasklet implements Tasklet {
+
+	private static final Logger log = LoggerFactory.getLogger(DocumentProducerTasklet.class);
 
 	private final DocumentProducer documentProducer;
 
 	private final File target;
 
+	DocumentProducerTasklet(DocumentProducer documentProducer, File target) {
+		this.documentProducer = documentProducer;
+		this.target = target;
+	}
+
 	@Override
 	public RepeatStatus execute(StepContribution stepContribution, ChunkContext context) throws Exception {
 		var simpleName = this.documentProducer.getClass().getSimpleName();
-		log.info("starting tasklet for " + simpleName + '.');
+		log.info("starting tasklet for {}.", simpleName);
 		var fileArray = this.documentProducer.produce();
-		log.info("stopping tasklet for " + simpleName + '.');
+		log.info("stopping tasklet for {}.", simpleName);
 		for (var f : fileArray) {
 			this.copyToOutputDirectory(simpleName, f);
 		}
@@ -54,7 +58,6 @@ class DocumentProducerTasklet implements Tasklet {
 		files.put(this.documentProducer.getClass().getSimpleName(), Arrays.asList(fileArray));
 	}
 
-	@SneakyThrows
 	private void copyToOutputDirectory(String type, File file) {
 		var newFile = new File(new File(this.target, type), file.getName());
 		if (!newFile.exists()) {

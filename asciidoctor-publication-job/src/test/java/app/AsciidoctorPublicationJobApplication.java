@@ -1,8 +1,9 @@
 package app;
 
 import bootiful.asciidoctor.DocumentsPublishedEvent;
-import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.batch.JobExecutionEvent;
@@ -13,9 +14,10 @@ import org.springframework.core.env.Environment;
 
 import java.util.List;
 
-@Slf4j
 @SpringBootApplication
 class AsciidoctorPublicationJobApplication {
+
+	private static final Logger log = LoggerFactory.getLogger(AsciidoctorPublicationJobApplication.class);
 
 	@Bean
 	UsernamePasswordCredentialsProvider usernamePasswordCredentialsProvider(@Value("${GIT_USERNAME}") String user,
@@ -28,14 +30,14 @@ class AsciidoctorPublicationJobApplication {
 		return event -> {
 			log.info("Ding! The files are ready!");
 			for (var entry : event.getSource().entrySet()) {
-				log.info(entry.getKey() + '=' + entry.getValue());
+				log.info("{}={}", entry.getKey(), entry.getValue());
 			}
 		};
 	}
 
 	@Bean
 	ApplicationListener<ApplicationReadyEvent> applicationReadyListener(Environment environment) {
-		return event -> List.of("pipeline.job.root", "publication.root", "publication.code")
+		return _ -> List.of("pipeline.job.root", "publication.root", "publication.code")
 				.forEach(propertyName -> log.debug(propertyName + '=' + environment.getProperty(propertyName)));
 	}
 
@@ -46,8 +48,8 @@ class AsciidoctorPublicationJobApplication {
 			var createTime = jobExecution.getCreateTime();
 			var endTime = jobExecution.getEndTime();
 			var jobName = jobExecution.getJobInstance().getJobName();
-			log.info("job (" + jobName + ") start time: " + createTime.toString());
-			log.info("job (" + jobName + ") stop time: " + endTime.toString());
+			log.info("job ({}) start time: {}", jobName, createTime);
+			log.info("job ({}) stop time: {}", jobName, endTime.toString());
 		};
 	}
 

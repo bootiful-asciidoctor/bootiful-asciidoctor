@@ -1,6 +1,7 @@
 package bootiful.asciidoctor.autoconfigure;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 
@@ -11,8 +12,9 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
-@Slf4j
 public abstract class FileCopyUtils {
+
+	private static final Logger log = LoggerFactory.getLogger(FileCopyUtils.class);
 
 	public static void copy(InputStream i, OutputStream o) {
 		try {

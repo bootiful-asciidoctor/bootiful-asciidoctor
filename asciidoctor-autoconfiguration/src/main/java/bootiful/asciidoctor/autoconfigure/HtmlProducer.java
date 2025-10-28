@@ -1,18 +1,21 @@
 package bootiful.asciidoctor.autoconfigure;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.asciidoctor.Asciidoctor;
 
 import java.io.File;
 
-@Slf4j
-@RequiredArgsConstructor
 class HtmlProducer implements DocumentProducer {
+
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(HtmlProducer.class);
 
 	private final PublicationProperties properties;
 
 	private final Asciidoctor asciidoctor;
+
+	HtmlProducer(PublicationProperties properties, Asciidoctor asciidoctor) {
+		this.properties = properties;
+		this.asciidoctor = asciidoctor;
+	}
 
 	@Override
 	public File[] produce() {
@@ -22,7 +25,7 @@ class HtmlProducer implements DocumentProducer {
 		var rootTarget = index.getParentFile();
 		if (!rootTarget.exists())
 			rootTarget.mkdirs();
-		log.info("being asked to generate the HTML to " + rootTarget.getAbsolutePath());
+		log.info("being asked to generate the HTML to {}", rootTarget.getAbsolutePath());
 		var html = this.buildCommonOptions("html", builder.build()).toFile(new File(rootTarget, "index.html"));
 		asciidoctor.convertFile(index, html.build());
 		var images = new File(rootTarget, "images");

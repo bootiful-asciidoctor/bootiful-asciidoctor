@@ -2,13 +2,6 @@ package bootiful.asciidoctor.publishers;
 
 import bootiful.asciidoctor.git.GitCloneCallback;
 import bootiful.asciidoctor.git.GitPushCallback;
-import com.amazonaws.ClientConfiguration;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -16,17 +9,27 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+
+import java.time.Duration;
 
 /**
  * @author Josh Long
  * @author Trisha Gee
  */
 @AutoConfiguration
-@RequiredArgsConstructor
 @EnableConfigurationProperties(PipelineJobPublishersProperties.class)
 class DocumentPublisherAutoConfiguration {
 
 	private final PipelineJobPublishersProperties properties;
+
+	DocumentPublisherAutoConfiguration(PipelineJobPublishersProperties properties) {
+		this.properties = properties;
+	}
 
 	@Bean
 	@ConditionalOnProperty(value = "pipeline.job.publishers.git.enabled", havingValue = "true")
@@ -38,33 +41,35 @@ class DocumentPublisherAutoConfiguration {
 	}
 
 	@Configuration
-	@RequiredArgsConstructor
-	@ConditionalOnClass(AmazonS3.class)
+	@ConditionalOnClass(S3Client.class)
 	@ConditionalOnProperty(value = "pipeline.job.publishers.s3.enabled", havingValue = "true")
 	public static class AmazonS3Configuration {
 
 		private final PipelineJobPublishersProperties properties;
 
+		public AmazonS3Configuration(PipelineJobPublishersProperties properties) {
+			this.properties = properties;
+		}
+
 		@Bean
-		AwsS3DocumentPublisher awsS3DocumentPublisher(AmazonS3 s3) {
+		AwsS3DocumentPublisher awsS3DocumentPublisher(S3Client s3) {
 			return new AwsS3DocumentPublisher(s3, this.properties.s3().bucketName());
 		}
 
 		@Bean
 		@ConditionalOnMissingBean
-		AmazonS3 amazonS3() {
+		S3Client amazonS3() {
 			var s3 = this.properties.s3();
 			var accessKey = s3.accessKeyId();
 			var secret = s3.secretAccessKey();
-			var region = s3.region();
-			var credentials = new BasicAWSCredentials(accessKey, secret);
-			var timeout = 5 * 60 * 1000;
-			var clientConfiguration = new ClientConfiguration().withClientExecutionTimeout(timeout)
-					.withConnectionMaxIdleMillis(timeout).withConnectionTimeout(timeout).withConnectionTTL(timeout)
-					.withRequestTimeout(timeout);
-			return AmazonS3ClientBuilder.standard().withClientConfiguration(clientConfiguration)
-					.withCredentials(new AWSStaticCredentialsProvider(credentials)).withRegion(Regions.fromName(region))
-					.build();
+			var region = Region.of(s3.region());
+			var credentials = AwsBasicCredentials.builder().accessKeyId(accessKey).secretAccessKey(secret).build();
+			var timeout = Duration.ofMinutes(5);
+
+			var clientConfiguration = ClientOverrideConfiguration.builder().apiCallTimeout(timeout).build();
+
+			return S3Client.builder().credentialsProvider(StaticCredentialsProvider.create(credentials))
+					.overrideConfiguration(clientConfiguration).region(region).build();
 		}
 
 	}

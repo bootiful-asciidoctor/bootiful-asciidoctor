@@ -1,12 +1,12 @@
 package bootiful.asciidoctor.publishers;
 
 import bootiful.asciidoctor.files.ZipUtils;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
+import java.io.IOException;
 
 class ZipUtilsTest {
 
@@ -30,9 +30,13 @@ class ZipUtilsTest {
 
 	}
 
-	@SneakyThrows
 	private File fileFromClassPathPath(String path) {
-		return new ClassPathResource(path).getFile();
+		try {
+			return new ClassPathResource(path).getFile();
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }

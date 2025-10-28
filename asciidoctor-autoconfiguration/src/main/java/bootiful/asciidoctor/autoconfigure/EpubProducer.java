@@ -1,16 +1,19 @@
 package bootiful.asciidoctor.autoconfigure;
 
-import lombok.RequiredArgsConstructor;
 import org.asciidoctor.Asciidoctor;
 
 import java.io.File;
 
-@RequiredArgsConstructor
 class EpubProducer implements DocumentProducer {
 
 	private final PublicationProperties properties;
 
 	private final Asciidoctor asciidoctor;
+
+	EpubProducer(PublicationProperties properties, Asciidoctor asciidoctor) {
+		this.properties = properties;
+		this.asciidoctor = asciidoctor;
+	}
 
 	@Override
 	public File[] produce() {

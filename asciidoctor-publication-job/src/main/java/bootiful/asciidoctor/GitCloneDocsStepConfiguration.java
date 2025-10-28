@@ -2,8 +2,8 @@ package bootiful.asciidoctor;
 
 import bootiful.asciidoctor.files.FileUtils;
 import bootiful.asciidoctor.git.GitCloneCallback;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.flow.Flow;
@@ -16,10 +16,10 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import java.net.URI;
 
-@Slf4j
 @Configuration
-@RequiredArgsConstructor
 class GitCloneDocsStepConfiguration {
+
+	private static final Logger log = LoggerFactory.getLogger(GitCloneDocsStepConfiguration.class);
 
 	private final PipelineJobProperties pipelineJobProperties;
 
@@ -28,6 +28,14 @@ class GitCloneDocsStepConfiguration {
 	private final JobRepository jobRepository;
 
 	private final PlatformTransactionManager ptx;
+
+	GitCloneDocsStepConfiguration(PipelineJobProperties pipelineJobProperties, GitCloneCallback cloneCallback,
+			JobRepository jobRepository, PlatformTransactionManager ptx) {
+		this.pipelineJobProperties = pipelineJobProperties;
+		this.cloneCallback = cloneCallback;
+		this.jobRepository = jobRepository;
+		this.ptx = ptx;
+	}
 
 	@Bean
 	Flow docsFlow() {
@@ -44,7 +52,7 @@ class GitCloneDocsStepConfiguration {
 					FileUtils.resetOrRecreateDirectory(docs);
 					var docsUri = URI.create(pipelineJobProperties.documentRepository().trim());
 					cloneCallback.clone(docsUri, docs);
-					log.info("cloned " + docsUri + " to " + docs.getAbsolutePath() + '.');
+					log.info("cloned {} to {}.", docsUri, docs.getAbsolutePath());
 					return RepeatStatus.FINISHED;
 				}, this.ptx) //
 				.build();

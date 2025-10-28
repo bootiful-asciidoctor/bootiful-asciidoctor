@@ -1,14 +1,16 @@
 package bootiful.asciidoctor.autoconfigure;
 
-import lombok.extern.slf4j.Slf4j;
 import org.asciidoctor.Asciidoctor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import java.io.File;
 import java.util.ArrayList;
 
-@Slf4j
 abstract class AbstractPdfProducer implements DocumentProducer {
+
+	private static final Logger log = LoggerFactory.getLogger(AbstractPdfProducer.class);
 
 	private final PublicationProperties properties;
 

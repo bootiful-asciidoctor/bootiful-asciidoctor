@@ -6,20 +6,20 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.0</version>
+        <version>3.5.7</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>bootiful.asciidoctor</groupId>
     <packaging>pom</packaging>
     <artifactId>parent</artifactId>
     <name>bootiful-asciidoctor</name>
-    <version>0.0.4-SNAPSHOT</version>
+    <version>0.0.5-SNAPSHOT</version>
     <properties>
         <jruby.version>9.3.4.0</jruby.version>
-        <aws-java-sdk.version>1.12.352</aws-java-sdk.version>
+        <aws-java-sdk.version>2.36.3</aws-java-sdk.version>
         <asciidoctorj-pdf.version>2.3.0</asciidoctorj-pdf.version>
         <asciidoctorj-epub3.version>1.5.1</asciidoctorj-epub3.version>
-        <java.version>17</java.version>
+        <java.version>25</java.version>
     </properties>
     <modules>
         <module>asciidoctor-autoconfiguration</module>
@@ -28,25 +28,29 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
+                <version>${aws-java-sdk.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
                 <groupId>com.joshlong</groupId>
                 <artifactId>git-spring-boot-starter</artifactId>
                 <version>0.0.3-SNAPSHOT</version>
             </dependency>
+
             <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-s3</artifactId>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>s3</artifactId>
                 <version>${aws-java-sdk.version}</version>
             </dependency>
-            <!--            <dependency>
-                            <groupId>com.amazonaws</groupId>
-                            <artifactId>aws-java-sdk</artifactId>
-                            <version>${aws-java-sdk.version}</version>
-                        </dependency>-->
             <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-sts</artifactId>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>sts</artifactId>
                 <version>${aws-java-sdk.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.asciidoctor</groupId>
                 <artifactId>asciidoctorj-epub3</artifactId>

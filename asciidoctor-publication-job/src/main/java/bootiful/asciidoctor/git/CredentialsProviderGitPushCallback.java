@@ -1,6 +1,5 @@
 package bootiful.asciidoctor.git;
 
-import lombok.RequiredArgsConstructor;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.CredentialsProvider;
@@ -10,10 +9,13 @@ import org.eclipse.jgit.transport.CredentialsProvider;
  * {@link org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider} for an
  * implementation that you will need when authenticating.
  */
-@RequiredArgsConstructor
 public class CredentialsProviderGitPushCallback implements GitPushCallback {
 
 	private final CredentialsProvider credentialsProvider;
+
+	public CredentialsProviderGitPushCallback(CredentialsProvider credentialsProvider) {
+		this.credentialsProvider = credentialsProvider;
+	}
 
 	@Override
 	public void push(Git git, String remote) throws GitAPIException {
