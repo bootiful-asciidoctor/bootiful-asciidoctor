@@ -63,7 +63,7 @@ abstract class AbstractPdfProducer implements DocumentProducer {
 
 		if (this.getPdfProducerConfiguration().optimize()) {
 			var pdfOptimizerQuality = this.getPdfProducerConfiguration().pdfOptimizerQuality();
-			log.debug("optimize value = " + pdfOptimizerQuality.toString().toLowerCase());
+			log.debug("optimize value = {}", pdfOptimizerQuality.toString().toLowerCase());
 			attributesBuilder.attribute("optimize", pdfOptimizerQuality.toString().toLowerCase());
 		}
 
@@ -74,7 +74,7 @@ abstract class AbstractPdfProducer implements DocumentProducer {
 		catch (RuntimeException exception) {
 			Assert.state(false, exception.getMessage());
 		}
-		log.info("inside " + this.getClass().getName() + " & just created " + file.getAbsolutePath() + '.');
+		log.info("inside {} & just created {}.", this.getClass().getName(), file.getAbsolutePath());
 		return file;
 	}
 

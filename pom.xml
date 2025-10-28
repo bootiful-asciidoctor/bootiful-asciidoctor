@@ -17,8 +17,8 @@
     <properties>
         <jruby.version>9.3.4.0</jruby.version>
         <aws-java-sdk.version>2.36.3</aws-java-sdk.version>
-        <asciidoctorj-pdf.version>2.3.0</asciidoctorj-pdf.version>
-        <asciidoctorj-epub3.version>1.5.1</asciidoctorj-epub3.version>
+        <asciidoctorj-pdf.version>2.3.21</asciidoctorj-pdf.version>
+        <asciidoctorj-epub3.version>2.2.0</asciidoctorj-epub3.version>
         <java.version>25</java.version>
     </properties>
     <modules>

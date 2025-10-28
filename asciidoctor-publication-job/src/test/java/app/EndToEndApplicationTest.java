@@ -3,10 +3,10 @@ package app;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.SpringApplication;
 
-public class EndToEndApplicationTest {
+class EndToEndApplicationTest {
 
 	@Test
-	public void runAppEndToEnd() {
+	void runAppEndToEnd() {
 		SpringApplication.run(AsciidoctorPublicationJobApplication.class);
 	}
 
