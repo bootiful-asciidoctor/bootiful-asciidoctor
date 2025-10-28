@@ -1,12 +1,8 @@
 package bootiful.asciidoctor.files;
 
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.util.Objects;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
@@ -16,19 +12,16 @@ import java.util.zip.ZipOutputStream;
  * Zip files are a common way to communicate the aggregation of the output of the
  * pipeline. This class supports easy archival.
  */
-@Slf4j
 public abstract class ZipUtils {
 
 	public static void buildZipFileFromDirectory(File zipFile, File directory) {
 		zip(zipFile, directory, Objects.requireNonNull(directory.listFiles()));
 	}
 
-	@SneakyThrows
 	public static void buildZipFileFromFiles(File zipFile, File[] fileList) {
 		zip(zipFile, getCommonDirectoryFor(fileList), fileList);
 	}
 
-	@SneakyThrows
 	private static void zip(File zipFile, File base, File[] fileList) {
 		var buffer = new byte[1024];
 		try (var fos = new FileOutputStream(zipFile); var zos = new ZipOutputStream(fos)) {
@@ -47,6 +40,9 @@ public abstract class ZipUtils {
 					zos.flush();
 				}
 			}
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 

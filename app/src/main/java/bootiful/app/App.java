@@ -1,7 +1,6 @@
 package bootiful.app;
 
 import bootiful.asciidoctor.DocumentsPublishedEvent;
-import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.jruby.util.log.LoggerFactory;
 import org.jruby.util.log.StandardErrorLogger;
@@ -21,7 +20,6 @@ import org.springframework.core.env.Environment;
 
 import java.util.List;
 
-@Slf4j
 @ImportRuntimeHints(App.Hints.class)
 @SpringBootApplication
 public class App {

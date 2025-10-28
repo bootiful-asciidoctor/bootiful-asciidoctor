@@ -1,11 +1,8 @@
 package bootiful.asciidoctor.autoconfigure;
 
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * todo bless this as a real test for CI
  */
-@Slf4j
 class PrepressPdfProducerTest {
 
 	// @Test

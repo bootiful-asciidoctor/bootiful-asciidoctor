@@ -1,7 +1,6 @@
 package bootiful.asciidoctor;
 
 import bootiful.asciidoctor.files.FileUtils;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -14,7 +13,6 @@ import java.util.Objects;
 /**
  * map one property to the other so that we need to configure it but once.
  */
-@Slf4j
 class ForwardingEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
 	@Override

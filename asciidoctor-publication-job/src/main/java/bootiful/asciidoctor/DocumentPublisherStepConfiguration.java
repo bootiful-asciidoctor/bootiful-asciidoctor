@@ -1,6 +1,5 @@
 package bootiful.asciidoctor;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.flow.Flow;
@@ -12,7 +11,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-@RequiredArgsConstructor
 class DocumentPublisherStepConfiguration {
 
 	private final ObjectProvider<DocumentPublisher> publishers;
@@ -20,6 +18,13 @@ class DocumentPublisherStepConfiguration {
 	private final JobRepository repository;
 
 	private final PlatformTransactionManager transactionManager;
+
+	DocumentPublisherStepConfiguration(ObjectProvider<DocumentPublisher> publishers, JobRepository repository,
+			PlatformTransactionManager transactionManager) {
+		this.publishers = publishers;
+		this.repository = repository;
+		this.transactionManager = transactionManager;
+	}
 
 	@Bean
 	Step documentPublisherStep() {

@@ -1,6 +1,5 @@
 package bootiful.asciidoctor.git;
 
-import lombok.RequiredArgsConstructor;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -13,10 +12,13 @@ import org.eclipse.jgit.transport.SshSessionFactory;
  * for some easy factory methods to build a bean of type {@link TransportConfigCallback}
  * which this class will need to authenticate when doing the {@code git push}
  */
-@RequiredArgsConstructor
 public class TransportConfigCallbackGitPushCallback implements GitPushCallback {
 
 	private final TransportConfigCallback configCallback;
+
+	public TransportConfigCallbackGitPushCallback(TransportConfigCallback configCallback) {
+		this.configCallback = configCallback;
+	}
 
 	@Override
 	public void push(Git git, String remote) throws GitAPIException {

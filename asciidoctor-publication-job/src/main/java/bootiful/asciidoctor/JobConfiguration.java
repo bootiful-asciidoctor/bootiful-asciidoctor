@@ -1,7 +1,5 @@
 package bootiful.asciidoctor;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -13,9 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 
-@Slf4j
 @Configuration
-@RequiredArgsConstructor
 class JobConfiguration {
 
 	private final static String SPLIT_FLOW_ID = "splitFlow";

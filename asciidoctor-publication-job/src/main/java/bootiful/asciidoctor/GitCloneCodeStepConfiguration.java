@@ -2,9 +2,9 @@ package bootiful.asciidoctor;
 
 import bootiful.asciidoctor.files.FileUtils;
 import com.joshlong.git.GitUtils;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.api.Git;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.flow.Flow;
@@ -33,9 +33,10 @@ import java.util.stream.Stream;
  * so that there's special handling for the docs repository which needs to be under a
  * well-known folder
  */
-@Slf4j
 @Configuration
 class GitCloneCodeStepConfiguration {
+
+	private static final Logger log = LoggerFactory.getLogger(GitCloneCodeStepConfiguration.class);
 
 	private final TaskExecutor executor;
 
@@ -101,10 +102,9 @@ class GitCloneCodeStepConfiguration {
 				.build();
 	}
 
-	@SneakyThrows
 	private Git createLocalGitRepositoryFor(URI uri) {
 		var newCloneDirectory = this.cloneFunction.apply(uri);
-		log.info("going to clone " + uri.toString() + " to " + newCloneDirectory.getAbsolutePath());
+		log.info("going to clone {} to {}", uri.toString(), newCloneDirectory.getAbsolutePath());
 		FileUtils.resetOrRecreateDirectory(newCloneDirectory);
 		return GitUtils.createLocalHttpGitRepository(uri, newCloneDirectory);
 	}

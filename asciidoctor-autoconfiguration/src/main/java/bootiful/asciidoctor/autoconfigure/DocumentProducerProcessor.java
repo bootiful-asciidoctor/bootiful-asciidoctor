@@ -1,7 +1,7 @@
 package bootiful.asciidoctor.autoconfigure;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.util.Assert;
@@ -15,18 +15,23 @@ import static bootiful.asciidoctor.autoconfigure.FileCopyUtils.copy;
  * This is only run IF it's specifically enabled. The client of this API may run the
  * {@link DocumentProducer} instances as they please.
  */
-@Slf4j
 @Deprecated
-@RequiredArgsConstructor
 class DocumentProducerProcessor {
+
+	private static final Logger log = LoggerFactory.getLogger(DocumentProducerProcessor.class);
 
 	private final DocumentProducer[] producers;
 
 	private final PublicationProperties properties;
 
+	DocumentProducerProcessor(DocumentProducer[] producers, PublicationProperties properties) {
+		this.producers = producers;
+		this.properties = properties;
+	}
+
 	@EventListener(ApplicationReadyEvent.class)
 	public void produceDocuments() {
-		log.info("there are " + this.producers.length + " " + DocumentProducer.class.getName() + " instances");
+		log.info("there are {} {} instances", this.producers.length, DocumentProducer.class.getName());
 		Stream.of(this.producers).forEach(producer -> {
 			try {
 				var filesArray = producer.produce();
@@ -36,8 +41,8 @@ class DocumentProducerProcessor {
 				}
 			}
 			catch (Exception e) {
-				log.error("had trouble running " + producer.getClass().getName()
-						+ " and received the following exception: ", e);
+				log.error("had trouble running {} and received the following exception: ",
+						producer.getClass().getName(), e);
 			}
 		});
 	}

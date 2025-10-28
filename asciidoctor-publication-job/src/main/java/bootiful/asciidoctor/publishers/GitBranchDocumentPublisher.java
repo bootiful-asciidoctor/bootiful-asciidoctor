@@ -5,8 +5,9 @@ import bootiful.asciidoctor.autoconfigure.FileCopyUtils;
 import bootiful.asciidoctor.files.FileUtils;
 import bootiful.asciidoctor.git.GitCloneCallback;
 import bootiful.asciidoctor.git.GitPushCallback;
-import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.api.CreateBranchCommand;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import java.io.File;
@@ -22,8 +23,9 @@ import java.util.Map;
  * @author Josh Long
  * @author Trisha Gee
  */
-@Slf4j
 class GitBranchDocumentPublisher implements DocumentPublisher {
+
+	private static final Logger log = LoggerFactory.getLogger(GitBranchDocumentPublisher.class);
 
 	private final URI repository;
 

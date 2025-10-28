@@ -1,22 +1,25 @@
 package bootiful.asciidoctor.autoconfigure;
 
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.jruby.internal.AsciidoctorCoreException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * This is _super_ fragile. In order for this to work you need to provide an environment
  * variable - ${code KINDLEGEN} - where the ${code kindlegen} binary can be found. The
  * environment variable should point to the location of the `kindlegen` binary itself.
  */
-@Slf4j
 class MobiProducer implements DocumentProducer {
+
+	private static final Logger log = LoggerFactory.getLogger(MobiProducer.class);
 
 	private final PublicationProperties properties;
 
@@ -65,7 +68,6 @@ class MobiProducer implements DocumentProducer {
 		return bf;
 	}
 
-	@SneakyThrows
 	private void installKindlegen() {
 		var binaryLocation = binaryLocationForKindlegen(
 				this.properties.mobi() != null && this.properties.mobi().kindlegen() != null
@@ -81,10 +83,14 @@ class MobiProducer implements DocumentProducer {
 		try (var inputStream = this.kindlegenBinary.getInputStream();
 				var outputStream = new FileOutputStream(binaryLocation)) {
 			FileCopyUtils.copy(inputStream, outputStream);
+
+			// binaryLocation.setExecutable(true);
+			Assert.state(0 == Runtime.getRuntime().exec("chmod a+x " + binaryLocation.getAbsolutePath()).waitFor(),
+					"couldn't make the kindlegen binary executable");
 		}
-		// binaryLocation.setExecutable(true);
-		Assert.state(0 == Runtime.getRuntime().exec("chmod a+x " + binaryLocation.getAbsolutePath()).waitFor(),
-				"couldn't make the kindlegen binary executable");
+		catch (InterruptedException | IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }
