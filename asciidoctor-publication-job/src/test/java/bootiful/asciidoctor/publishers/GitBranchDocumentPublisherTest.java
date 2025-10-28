@@ -4,6 +4,8 @@ import bootiful.asciidoctor.git.CredentialsProviderGitCloneCallback;
 import bootiful.asciidoctor.git.CredentialsProviderGitPushCallback;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
@@ -18,6 +20,8 @@ import java.util.Map;
  * @author Trisha Gee
  */
 class GitBranchDocumentPublisherTest {
+
+	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	private File fileFromClassPathPath(String path) {
 		try {
@@ -35,13 +39,16 @@ class GitBranchDocumentPublisherTest {
 		var gitHttpUsername = System.getenv("GIT_USERNAME");
 		var gitHttpPassword = System.getenv("GIT_PASSWORD");
 		var repository = URI.create(repositoryUri);
+
+		this.logger.debug("{}:{}", gitHttpUsername, gitHttpPassword);
+
 		var credentialsProvider = new UsernamePasswordCredentialsProvider(gitHttpUsername, gitHttpPassword);
 		var httpAuthGitClone = new CredentialsProviderGitCloneCallback(credentialsProvider);
 		var httpAuthGitPush = new CredentialsProviderGitPushCallback(credentialsProvider);
 		var dp = new GitBranchDocumentPublisher(repository, artifactBranch, httpAuthGitPush, httpAuthGitClone);
 		var epub = fileFromClassPathPath("files/epub/index.epub");
 		var html = fileFromClassPathPath("files/html/index.html");
-		var map = Map.of("epub", (Collection<File>) List.of(epub), "html", (Collection<File>) List.of(html));
+		var map = Map.of("epub", List.of(epub), "html", (Collection<File>) List.of(html));
 		dp.publish(map);
 
 	}
