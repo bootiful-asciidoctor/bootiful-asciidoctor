@@ -1,8 +1,7 @@
 package bootiful.asciidoctor;
 
 import bootiful.asciidoctor.files.FileUtils;
-import com.joshlong.git.GitUtils;
-import org.eclipse.jgit.api.Git;
+import bootiful.asciidoctor.git.GitCloneCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Step;
@@ -80,33 +79,31 @@ class GitCloneCodeStepConfiguration {
 	}
 
 	@Bean
-	ItemWriter<URI> writer() {
-		return items -> items.forEach(this::createLocalGitRepositoryFor);
+	ItemWriter<URI> writer(GitCloneCallback cloneCallback) {
+		return items -> items.forEach(uri -> createLocalGitRepositoryFor(cloneCallback, uri));
 	}
 
 	@Bean
-	Step gitCloneCodeStep() {
+	Step gitCloneCodeStep(GitCloneCallback gitCloneCallback) {
 		// chunk size of 1 to ensure that we clone each repository on a separate thread.
 		return new StepBuilder("clone-git-repositories", this.jobRepository)//
 				.<URI, URI>chunk(1, this.ptm)//
 				.reader(reader())//
-				.writer(writer())//
+				.writer(writer(gitCloneCallback))//
 				.taskExecutor(this.executor)//
 				.build();
 	}
 
 	@Bean
-	Flow codeFlow() {
+	Flow codeFlow(GitCloneCallback gitCloneCallback) {
 		return new FlowBuilder<Flow>("gitCloneRepositoriesFlow")//
-				.start(gitCloneCodeStep()) //
+				.start(gitCloneCodeStep(gitCloneCallback)) //
 				.build();
 	}
 
-	private Git createLocalGitRepositoryFor(URI uri) {
+	private void createLocalGitRepositoryFor(GitCloneCallback cloneCallback, URI uri) {
 		var newCloneDirectory = this.cloneFunction.apply(uri);
-		log.info("going to clone {} to {}", uri.toString(), newCloneDirectory.getAbsolutePath());
-		FileUtils.resetOrRecreateDirectory(newCloneDirectory);
-		return GitUtils.createLocalHttpGitRepository(uri, newCloneDirectory);
+		CloneUtils.doClone(cloneCallback, uri, newCloneDirectory);
 	}
 
 }

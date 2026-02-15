@@ -32,7 +32,7 @@ class JobConfiguration {
 		return new JobBuilder("publicationJob", jobRepository)//
 				.incrementer(new RunIdIncrementer()) //
 				.start(docs.docsFlow()) //
-				.next(code.codeFlow()) //
+				.next(code.codeFlow(null)) //
 				.next(flow) //
 				.next(publishing.publicationFlow()) //
 				.build() //

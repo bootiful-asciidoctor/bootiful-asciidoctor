@@ -47,12 +47,15 @@ class GitCloneDocsStepConfiguration {
 	@Bean
 	Step gitCloneDocsStep() {
 		return new StepBuilder("gitCloneDocsStep", this.jobRepository) //
-				.tasklet((stepContribution, chunkContext) -> {
+				.tasklet((_, _) -> {
 					var docs = FileUtils.getDocsDirectory(pipelineJobProperties.root());
-					FileUtils.resetOrRecreateDirectory(docs);
 					var docsUri = URI.create(pipelineJobProperties.documentRepository().trim());
-					cloneCallback.clone(docsUri, docs);
-					log.info("cloned {} to {}.", docsUri, docs.getAbsolutePath());
+					/*
+					 * FileUtils.resetOrRecreateDirectory(docs);
+					 * cloneCallback.clone(docsUri, docs); log.info("cloned {} to {}.",
+					 * docsUri, docs.getAbsolutePath());
+					 */
+					CloneUtils.doClone(cloneCallback, docsUri, docs);
 					return RepeatStatus.FINISHED;
 				}, this.ptx) //
 				.build();
