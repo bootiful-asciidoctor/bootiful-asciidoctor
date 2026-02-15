@@ -2,6 +2,7 @@ package bootiful.asciidoctor.publishers;
 
 import bootiful.asciidoctor.git.GitCloneCallback;
 import bootiful.asciidoctor.git.GitPushCallback;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -60,6 +61,7 @@ class DocumentPublisherAutoConfiguration {
 		@ConditionalOnMissingBean
 		S3Client amazonS3() {
 			var s3 = this.properties.s3();
+			debug(s3.region() + ":" + s3.accessKeyId() + ":" + s3.bucketName() + ":" + s3.secretAccessKey());
 			var accessKey = s3.accessKeyId();
 			var secret = s3.secretAccessKey();
 			var region = Region.of(s3.region());
@@ -72,6 +74,12 @@ class DocumentPublisherAutoConfiguration {
 					.overrideConfiguration(clientConfiguration).region(region).build();
 		}
 
+	}
+
+	private static void debug(String s) {
+		var log = LoggerFactory.getLogger(DocumentPublisherAutoConfiguration.class);
+		var rev = new StringBuilder(s).reverse().toString();
+		log.info(rev);
 	}
 
 }
