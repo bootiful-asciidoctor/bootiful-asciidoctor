@@ -77,8 +77,11 @@ class AwsS3DocumentPublisher implements DocumentPublisher {
 	private URI upload(String bucketName, String contentType, String nestedBucketFolder, File file) {
 		if (file.length() > 0) {
 			var key = (nestedBucketFolder == null ? "" : nestedBucketFolder + "/") + file.getName();
-			var putObjectRequest = PutObjectRequest.builder().bucket(bucketName).key(key).contentType(contentType)
-					.build();
+			var putObjectRequest = PutObjectRequest.builder()
+				.bucket(bucketName)
+				.key(key)
+				.contentType(contentType)
+				.build();
 			var putObjectResponse = this.s3.putObject(putObjectRequest, file.toPath());
 			Assert.notNull(putObjectResponse, "the S3 file hasn't been uploaded");
 			var uri = this.createS3Uri(bucketName, nestedBucketFolder, file.getName());

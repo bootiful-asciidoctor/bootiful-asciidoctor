@@ -48,9 +48,9 @@ public abstract class ZipUtils {
 
 	private static File getCommonDirectoryFor(File[] files) {
 		var stringsArray = Stream//
-				.of(files)//
-				.map(File::getAbsolutePath)//
-				.toArray(String[]::new);
+			.of(files)//
+			.map(File::getAbsolutePath)//
+			.toArray(String[]::new);
 		var commonRoot = getLongestCommonPrefix(stringsArray);
 		var root = new File(commonRoot);
 		while (!root.isDirectory()) {

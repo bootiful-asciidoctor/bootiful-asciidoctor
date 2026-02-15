@@ -29,8 +29,8 @@ class DocumentPublisherStepConfiguration {
 	@Bean
 	Step documentPublisherStep() {
 		return new StepBuilder("documentPublisherStep", this.repository)//
-				.tasklet(this.documentPublisherTasklet(), this.transactionManager) //
-				.build();
+			.tasklet(this.documentPublisherTasklet(), this.transactionManager) //
+			.build();
 	}
 
 	@Bean

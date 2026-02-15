@@ -21,17 +21,17 @@ public interface DocumentProducer {
 	default AttributesBuilder buildCommonAttributes(String bookName, String isbn, File source) {
 
 		return Attributes.builder()//
-				.title(bookName)//
-				.attribute("doctitle", bookName) //
-				.tableOfContents(true) //
-				.attribute("isbn", isbn) //
-				.attribute("book-name", bookName) //
-				.sectionNumbers(true) //
-				.attribute("code", source.getAbsolutePath()) //
-				.tableOfContents(true) //
-				.sectionNumbers(true) //
-				.imagesDir("images") //
-				.sourceHighlighter("coderay");
+			.title(bookName)//
+			.attribute("doctitle", bookName) //
+			.tableOfContents(true) //
+			.attribute("isbn", isbn) //
+			.attribute("book-name", bookName) //
+			.sectionNumbers(true) //
+			.attribute("code", source.getAbsolutePath()) //
+			.tableOfContents(true) //
+			.sectionNumbers(true) //
+			.imagesDir("images") //
+			.sourceHighlighter("coderay");
 	}
 
 	File[] produce() throws Exception;

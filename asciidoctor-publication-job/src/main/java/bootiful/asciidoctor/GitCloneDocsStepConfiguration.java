@@ -40,25 +40,24 @@ class GitCloneDocsStepConfiguration {
 	@Bean
 	Flow docsFlow() {
 		return new FlowBuilder<Flow>("gitCloneDocsFlow")//
-				.start(gitCloneDocsStep()) //
-				.build();
+			.start(gitCloneDocsStep()) //
+			.build();
 	}
 
 	@Bean
 	Step gitCloneDocsStep() {
 		return new StepBuilder("gitCloneDocsStep", this.jobRepository) //
-				.tasklet((_, _) -> {
-					var docs = FileUtils.getDocsDirectory(pipelineJobProperties.root());
-					var docsUri = URI.create(pipelineJobProperties.documentRepository().trim());
-					/*
-					 * FileUtils.resetOrRecreateDirectory(docs);
-					 * cloneCallback.clone(docsUri, docs); log.info("cloned {} to {}.",
-					 * docsUri, docs.getAbsolutePath());
-					 */
-					CloneUtils.doClone(cloneCallback, docsUri, docs);
-					return RepeatStatus.FINISHED;
-				}, this.ptx) //
-				.build();
+			.tasklet((_, _) -> {
+				var docs = FileUtils.getDocsDirectory(pipelineJobProperties.root());
+				var docsUri = URI.create(pipelineJobProperties.documentRepository().trim());
+				/*
+				 * FileUtils.resetOrRecreateDirectory(docs); cloneCallback.clone(docsUri,
+				 * docs); log.info("cloned {} to {}.", docsUri, docs.getAbsolutePath());
+				 */
+				CloneUtils.doClone(cloneCallback, docsUri, docs);
+				return RepeatStatus.FINISHED;
+			}, this.ptx) //
+			.build();
 	}
 
 }

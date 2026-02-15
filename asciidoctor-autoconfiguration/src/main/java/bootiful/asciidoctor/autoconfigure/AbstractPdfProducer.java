@@ -46,20 +46,20 @@ abstract class AbstractPdfProducer implements DocumentProducer {
 		var indexAdoc = getIndexAdoc(this.properties.root());
 		var pdf = this.properties.pdf();
 		var attributesBuilder = this.buildCommonAttributes(bookName, pdf.isbn(), indexAdoc)
-				.attribute("idseparator", "-") //
-				.imagesDir("images") //
-				.attribute("media", media) //
-				.attribute("code", this.properties.code().getAbsolutePath()) //
-				.attribute("icons", "font") //
-				.attribute("pdf-style", media) //
-				.attribute("idprefix") //
-				.attribute("project-version", "2.0.0-SNAPSHOT") //
-				.attribute("subject", bookName) //
-				.attribute("project-name", bookName) //
-				.attribute("pdfmarks")//
-				.attribute("notitle")//
-				.attribute("pdf-stylesdir", pdf.styles().getAbsolutePath()) //
-				.attribute("pdf-fontsdir", pdf.fonts().getAbsolutePath());
+			.attribute("idseparator", "-") //
+			.imagesDir("images") //
+			.attribute("media", media) //
+			.attribute("code", this.properties.code().getAbsolutePath()) //
+			.attribute("icons", "font") //
+			.attribute("pdf-style", media) //
+			.attribute("idprefix") //
+			.attribute("project-version", "2.0.0-SNAPSHOT") //
+			.attribute("subject", bookName) //
+			.attribute("project-name", bookName) //
+			.attribute("pdfmarks")//
+			.attribute("notitle")//
+			.attribute("pdf-stylesdir", pdf.styles().getAbsolutePath()) //
+			.attribute("pdf-fontsdir", pdf.fonts().getAbsolutePath());
 
 		if (this.getPdfProducerConfiguration().optimize()) {
 			var pdfOptimizerQuality = this.getPdfProducerConfiguration().pdfOptimizerQuality();

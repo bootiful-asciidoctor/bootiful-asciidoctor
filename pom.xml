@@ -15,9 +15,10 @@
     <name>bootiful-asciidoctor</name>
     <version>0.0.5-SNAPSHOT</version>
     <properties>
-        <jruby.version>9.3.4.0</jruby.version>
+<!--        <jruby.version>9.4.10.0</jruby.version>-->
+        <jruby.version>10.0.3.0</jruby.version>
         <aws-java-sdk.version>2.36.3</aws-java-sdk.version>
-        <asciidoctorj-pdf.version>2.3.21</asciidoctorj-pdf.version>
+        <asciidoctorj-pdf.version>2.3.23</asciidoctorj-pdf.version>
         <asciidoctorj-epub3.version>2.2.0</asciidoctorj-epub3.version>
         <java.version>25</java.version>
     </properties>
@@ -69,7 +70,7 @@
             <dependency>
                 <groupId>org.asciidoctor</groupId>
                 <artifactId>asciidoctorj</artifactId>
-                <version>2.5.4</version>
+                <version>3.0.1</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.jruby</groupId>
@@ -84,7 +85,7 @@
             <plugin>
                 <groupId>io.spring.javaformat</groupId>
                 <artifactId>spring-javaformat-maven-plugin</artifactId>
-                <version>0.0.25</version>
+                <version>0.0.47</version>
                 <executions>
                     <execution>
                         <phase>validate</phase>

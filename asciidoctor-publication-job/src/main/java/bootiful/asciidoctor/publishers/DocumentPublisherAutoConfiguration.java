@@ -71,8 +71,11 @@ class DocumentPublisherAutoConfiguration {
 
 			var clientConfiguration = ClientOverrideConfiguration.builder().apiCallTimeout(timeout).build();
 
-			return S3Client.builder().credentialsProvider(StaticCredentialsProvider.create(credentials))
-					.overrideConfiguration(clientConfiguration).region(region).build();
+			return S3Client.builder()
+				.credentialsProvider(StaticCredentialsProvider.create(credentials))
+				.overrideConfiguration(clientConfiguration)
+				.region(region)
+				.build();
 		}
 
 	}

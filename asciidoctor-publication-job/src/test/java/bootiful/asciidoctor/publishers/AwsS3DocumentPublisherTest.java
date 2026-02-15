@@ -47,8 +47,11 @@ class AwsS3DocumentPublisherTest {
 		var timeout = Duration.ofMinutes(5);
 		var clientConfiguration = ClientOverrideConfiguration.builder().apiCallTimeout(timeout).build();
 
-		return S3Client.builder().overrideConfiguration(clientConfiguration)
-				.credentialsProvider(StaticCredentialsProvider.create(credentials)).region(Region.of(region)).build();
+		return S3Client.builder()
+			.overrideConfiguration(clientConfiguration)
+			.credentialsProvider(StaticCredentialsProvider.create(credentials))
+			.region(Region.of(region))
+			.build();
 	}
 
 }

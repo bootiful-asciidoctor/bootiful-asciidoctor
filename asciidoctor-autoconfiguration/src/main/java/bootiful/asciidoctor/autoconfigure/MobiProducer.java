@@ -40,8 +40,8 @@ class MobiProducer implements DocumentProducer {
 		var indexAdoc = getIndexAdoc(this.properties.root());
 		var bookName = this.properties.bookName();
 		var attributesBuilder = this
-				.buildCommonAttributes(bookName, this.properties.mobi().isbn(), this.properties.code())
-				.attribute("ebook-format", "kf8");
+			.buildCommonAttributes(bookName, this.properties.mobi().isbn(), this.properties.code())
+			.attribute("ebook-format", "kf8");
 		var optionsBuilder = this.buildCommonOptions("epub3", attributesBuilder.build());
 		try {
 			asciidoctor.convertFile(indexAdoc, optionsBuilder.build());

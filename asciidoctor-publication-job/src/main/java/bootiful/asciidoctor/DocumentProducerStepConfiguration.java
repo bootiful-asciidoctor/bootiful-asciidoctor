@@ -36,17 +36,17 @@ class DocumentProducerStepConfiguration {
 		var platformTransactionManager = beans.getBean(PlatformTransactionManager.class);
 		var dpt = new DocumentProducerTasklet(documentProducer, props.target());
 		return new FlowBuilder<SimpleFlow>(beanName + "Flow")//
-				.start(new StepBuilder(beanName + DocumentProducer.class.getSimpleName() + "Step", jr)//
-						.tasklet(dpt, platformTransactionManager) //
-						.build() //
-				) //
-				.build();
+			.start(new StepBuilder(beanName + DocumentProducer.class.getSimpleName() + "Step", jr)//
+				.tasklet(dpt, platformTransactionManager) //
+				.build() //
+			) //
+			.build();
 	}
 
 	static class DocumentProducerBeanDefinitionRegistryPostProcessor implements BeanDefinitionRegistryPostProcessor {
 
 		private static final Logger log = LoggerFactory
-				.getLogger(DocumentProducerBeanDefinitionRegistryPostProcessor.class);
+			.getLogger(DocumentProducerBeanDefinitionRegistryPostProcessor.class);
 
 		@Override
 		public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry bdr) throws BeansException {

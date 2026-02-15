@@ -38,7 +38,7 @@ class AsciidoctorPublicationJobApplication {
 	@Bean
 	ApplicationListener<ApplicationReadyEvent> applicationReadyListener(Environment environment) {
 		return _ -> List.of("pipeline.job.root", "publication.root", "publication.code")
-				.forEach(propertyName -> log.debug(propertyName + '=' + environment.getProperty(propertyName)));
+			.forEach(propertyName -> log.debug(propertyName + '=' + environment.getProperty(propertyName)));
 	}
 
 	@Bean

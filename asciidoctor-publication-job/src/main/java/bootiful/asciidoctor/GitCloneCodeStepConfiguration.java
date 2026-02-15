@@ -58,10 +58,10 @@ class GitCloneCodeStepConfiguration {
 		this.cloneFunction = uri -> buildLocalCodeDirectoryFromGitUri(this.root, uri);
 		FileUtils.resetOrRecreateDirectory(this.root);
 		this.repositories = Stream //
-				.of(pipelineJobProperties.codeRepositories()) //
-				.map(String::trim) //
-				.map(URI::create)//
-				.collect(Collectors.toCollection(ConcurrentSkipListSet::new));
+			.of(pipelineJobProperties.codeRepositories()) //
+			.map(String::trim) //
+			.map(URI::create)//
+			.collect(Collectors.toCollection(ConcurrentSkipListSet::new));
 	}
 
 	protected File buildLocalCodeDirectoryFromGitUri(File root, URI uri) {
@@ -87,18 +87,18 @@ class GitCloneCodeStepConfiguration {
 	Step gitCloneCodeStep(GitCloneCallback gitCloneCallback) {
 		// chunk size of 1 to ensure that we clone each repository on a separate thread.
 		return new StepBuilder("clone-git-repositories", this.jobRepository)//
-				.<URI, URI>chunk(1, this.ptm)//
-				.reader(reader())//
-				.writer(writer(gitCloneCallback))//
-				.taskExecutor(this.executor)//
-				.build();
+			.<URI, URI>chunk(1, this.ptm)//
+			.reader(reader())//
+			.writer(writer(gitCloneCallback))//
+			.taskExecutor(this.executor)//
+			.build();
 	}
 
 	@Bean
 	Flow codeFlow(GitCloneCallback gitCloneCallback) {
 		return new FlowBuilder<Flow>("gitCloneRepositoriesFlow")//
-				.start(gitCloneCodeStep(gitCloneCallback)) //
-				.build();
+			.start(gitCloneCodeStep(gitCloneCallback)) //
+			.build();
 	}
 
 	private void createLocalGitRepositoryFor(GitCloneCallback cloneCallback, URI uri) {

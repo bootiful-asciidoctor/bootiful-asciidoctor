@@ -20,9 +20,9 @@ class JobConfiguration {
 	@Qualifier(SPLIT_FLOW_ID)
 	Flow splitFlow(TaskExecutor executor, @DocumentProducerFlow Flow[] flowList) {
 		return new FlowBuilder<Flow>(SPLIT_FLOW_ID)//
-				.split(executor) //
-				.add(flowList) //
-				.build();
+			.split(executor) //
+			.add(flowList) //
+			.build();
 	}
 
 	@Bean
@@ -30,13 +30,13 @@ class JobConfiguration {
 			GitCloneDocsStepConfiguration docs, DocumentPublisherStepConfiguration publishing,
 			@Qualifier(SPLIT_FLOW_ID) Flow flow) {
 		return new JobBuilder("publicationJob", jobRepository)//
-				.incrementer(new RunIdIncrementer()) //
-				.start(docs.docsFlow()) //
-				.next(code.codeFlow(null)) //
-				.next(flow) //
-				.next(publishing.publicationFlow()) //
-				.build() //
-				.build();
+			.incrementer(new RunIdIncrementer()) //
+			.start(docs.docsFlow()) //
+			.next(code.codeFlow(null)) //
+			.next(flow) //
+			.next(publishing.publicationFlow()) //
+			.build() //
+			.build();
 	}
 
 }

@@ -48,9 +48,9 @@ class DocumentProducerTasklet implements Tasklet {
 			return;
 
 		var executionContext = context.getStepContext() //
-				.getStepExecution() //
-				.getJobExecution()//
-				.getExecutionContext();
+			.getStepExecution() //
+			.getJobExecution()//
+			.getExecutionContext();
 		if (!executionContext.containsKey("files")) {
 			executionContext.put("files", new ConcurrentHashMap<String, List<File>>());
 		}
