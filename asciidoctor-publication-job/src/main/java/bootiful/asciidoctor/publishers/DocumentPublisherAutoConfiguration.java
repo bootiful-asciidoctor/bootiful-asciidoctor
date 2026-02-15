@@ -61,7 +61,8 @@ class DocumentPublisherAutoConfiguration {
 		@ConditionalOnMissingBean
 		S3Client amazonS3() {
 			var s3 = this.properties.s3();
-			debug(s3.region() + ":" + s3.accessKeyId() + ":" + s3.bucketName() + ":" + s3.secretAccessKey());
+			// debug(s3.region() + ":" + s3.accessKeyId() + ":" + s3.bucketName() + ":" +
+			// s3.secretAccessKey());
 			var accessKey = s3.accessKeyId();
 			var secret = s3.secretAccessKey();
 			var region = Region.of(s3.region());
