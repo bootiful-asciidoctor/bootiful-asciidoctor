@@ -1,6 +1,9 @@
 package bootiful.asciidoctor;
 
-import org.springframework.batch.item.support.IteratorItemReader;
+//import org.springframework.batch.item.support.IteratorItemReader;
+
+import org.jspecify.annotations.Nullable;
+import org.springframework.batch.infrastructure.item.support.IteratorItemReader;
 
 /**
  * This is important because the reads happen in a
@@ -17,7 +20,7 @@ class ConcurrentIteratorItemReader<T> extends IteratorItemReader<T> {
 	}
 
 	@Override
-	public T read() {
+	@Nullable public T read() {
 		synchronized (this.monitor) {
 			return super.read();
 		}

@@ -21,13 +21,12 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration
 class DocumentProducerStepConfiguration {
 
-	// todo this will probably need to be revisited in the light of the AOT engine.
 	@Bean
-	static BeanDefinitionRegistryPostProcessor flowRegisteringBeanDefinitionRegistryPostProcessor() {
+	static DocumentProducerBeanDefinitionRegistryPostProcessor flowRegisteringBeanDefinitionRegistryPostProcessor() {
 		return new DocumentProducerBeanDefinitionRegistryPostProcessor();
 	}
 
-	// this method is called in the supplier for the object, which is why its ok to work
+	// this method is called in the supplier for the object, which is why it's ok to work
 	// with references to the other beans
 	private static SimpleFlow buildFlow(BeanFactory beans, String beanName) {
 		var props = beans.getBean(PipelineJobProperties.class);
@@ -64,7 +63,6 @@ class DocumentProducerStepConfiguration {
 					}
 				}
 			}
-
 		}
 
 		@Override

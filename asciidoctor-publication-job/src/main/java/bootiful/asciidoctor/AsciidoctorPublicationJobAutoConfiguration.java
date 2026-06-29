@@ -10,14 +10,4 @@ import org.springframework.context.annotation.Import;
 @EnableConfigurationProperties(PipelineJobProperties.class)
 class AsciidoctorPublicationJobAutoConfiguration {
 
-	/*
-	 *
-	 * @Bean TaskExecutor taskExecutor(PipelineJobProperties properties) { var nThreads =
-	 * properties.maxThreadsInThreadpool() == 0 ?
-	 * Runtime.getRuntime().availableProcessors() : properties.maxThreadsInThreadpool();
-	 * var executor = Executors.newFixedThreadPool(nThreads); return new
-	 * ConcurrentTaskExecutor(executor); }
-	 *
-	 */
-
 }

@@ -4,17 +4,18 @@ import bootiful.asciidoctor.files.FileUtils;
 import bootiful.asciidoctor.git.GitCloneCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.ItemReader;
+import org.springframework.batch.infrastructure.item.ItemWriter;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.task.TaskExecutor;
-import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.core.task.AsyncTaskExecutor;
 
 import java.io.File;
 import java.net.URI;
@@ -37,7 +38,7 @@ class GitCloneCodeStepConfiguration {
 
 	private static final Logger log = LoggerFactory.getLogger(GitCloneCodeStepConfiguration.class);
 
-	private final TaskExecutor executor;
+	private final AsyncTaskExecutor executor;
 
 	private final File root;
 
@@ -47,11 +48,8 @@ class GitCloneCodeStepConfiguration {
 
 	private final JobRepository jobRepository;
 
-	private final PlatformTransactionManager ptm;
-
-	GitCloneCodeStepConfiguration(PipelineJobProperties pipelineJobProperties, TaskExecutor executor,
-			JobRepository jobRepository, PlatformTransactionManager ptm) {
-		this.ptm = ptm;
+	GitCloneCodeStepConfiguration(PipelineJobProperties pipelineJobProperties,
+			@Qualifier("applicationTaskExecutor") AsyncTaskExecutor executor, JobRepository jobRepository) {
 		this.executor = executor;
 		this.root = pipelineJobProperties.root();
 		this.jobRepository = jobRepository;
@@ -87,7 +85,7 @@ class GitCloneCodeStepConfiguration {
 	Step gitCloneCodeStep(GitCloneCallback gitCloneCallback) {
 		// chunk size of 1 to ensure that we clone each repository on a separate thread.
 		return new StepBuilder("clone-git-repositories", this.jobRepository)//
-			.<URI, URI>chunk(1, this.ptm)//
+			.<URI, URI>chunk(1)//
 			.reader(reader())//
 			.writer(writer(gitCloneCallback))//
 			.taskExecutor(this.executor)//
@@ -95,6 +93,7 @@ class GitCloneCodeStepConfiguration {
 	}
 
 	@Bean
+	@ConditionalOnBean(GitCloneCallback.class)
 	Flow codeFlow(GitCloneCallback gitCloneCallback) {
 		return new FlowBuilder<Flow>("gitCloneRepositoriesFlow")//
 			.start(gitCloneCodeStep(gitCloneCallback)) //

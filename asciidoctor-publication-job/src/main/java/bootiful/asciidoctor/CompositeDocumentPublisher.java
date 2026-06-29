@@ -1,5 +1,6 @@
 package bootiful.asciidoctor;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +19,7 @@ class CompositeDocumentPublisher implements DocumentPublisher {
 
 	private final DocumentPublisher[] defaults = new DocumentPublisher[] { this.noOpDefault };
 
-	CompositeDocumentPublisher(DocumentPublisher[] p) {
+	CompositeDocumentPublisher(@Nullable DocumentPublisher[] p) {
 		this.publishers = p == null || p.length == 0 ? this.defaults : p;
 		if (log.isDebugEnabled()) {
 			log.debug("there are {} {} instances configured", this.publishers.length,

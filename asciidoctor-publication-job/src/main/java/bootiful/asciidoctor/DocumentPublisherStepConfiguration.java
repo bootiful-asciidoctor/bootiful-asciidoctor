@@ -1,9 +1,9 @@
 package bootiful.asciidoctor;
 
-import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
@@ -35,7 +35,9 @@ class DocumentPublisherStepConfiguration {
 
 	@Bean
 	Flow publicationFlow() {
-		return new FlowBuilder<Flow>("documentPublisherFlow").start(documentPublisherStep()).build();
+		return new FlowBuilder<Flow>("documentPublisherFlow") //
+			.start(documentPublisherStep()) //
+			.build();
 	}
 
 	@Bean

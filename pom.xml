@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.7</version>
+        <version>4.1.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>bootiful.asciidoctor</groupId>
@@ -15,7 +15,6 @@
     <name>bootiful-asciidoctor</name>
     <version>0.0.5-SNAPSHOT</version>
     <properties>
-<!--        <jruby.version>9.4.10.0</jruby.version>-->
         <jruby.version>10.0.3.0</jruby.version>
         <aws-java-sdk.version>2.36.3</aws-java-sdk.version>
         <asciidoctorj-pdf.version>2.3.23</asciidoctorj-pdf.version>
@@ -40,7 +39,6 @@
                 <artifactId>git-spring-boot-starter</artifactId>
                 <version>0.0.3-SNAPSHOT</version>
             </dependency>
-
             <dependency>
                 <groupId>software.amazon.awssdk</groupId>
                 <artifactId>s3</artifactId>
