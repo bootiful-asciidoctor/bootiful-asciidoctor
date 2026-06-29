@@ -2,6 +2,7 @@ package bootiful.asciidoctor;
 
 import bootiful.asciidoctor.files.FileUtils;
 import bootiful.asciidoctor.git.GitCloneCallback;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.job.builder.FlowBuilder;
@@ -77,12 +78,12 @@ class GitCloneCodeStepConfiguration {
 	}
 
 	@Bean
-	ItemWriter<URI> writer(GitCloneCallback cloneCallback) {
+	ItemWriter<URI> writer(@Nullable GitCloneCallback cloneCallback) {
 		return items -> items.forEach(uri -> createLocalGitRepositoryFor(cloneCallback, uri));
 	}
 
 	@Bean
-	Step gitCloneCodeStep(GitCloneCallback gitCloneCallback) {
+	Step gitCloneCodeStep(@Nullable GitCloneCallback gitCloneCallback) {
 		// chunk size of 1 to ensure that we clone each repository on a separate thread.
 		return new StepBuilder("clone-git-repositories", this.jobRepository)//
 			.<URI, URI>chunk(1)//
@@ -93,8 +94,7 @@ class GitCloneCodeStepConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnBean(GitCloneCallback.class)
-	Flow codeFlow(GitCloneCallback gitCloneCallback) {
+	Flow codeFlow(@Nullable GitCloneCallback gitCloneCallback) {
 		return new FlowBuilder<Flow>("gitCloneRepositoriesFlow")//
 			.start(gitCloneCodeStep(gitCloneCallback)) //
 			.build();
