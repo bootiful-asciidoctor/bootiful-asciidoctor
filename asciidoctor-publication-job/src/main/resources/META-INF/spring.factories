@@ -1,1 +1,2 @@
-org.springframework.boot.env.EnvironmentPostProcessor=bootiful.asciidoctor.ForwardingEnvironmentPostProcessor
+#org.springframework.boot.env.EnvironmentPostProcessor=bootiful.asciidoctor.ForwardingEnvironmentPostProcessor
+org.springframework.boot.EnvironmentPostProcessor=bootiful.asciidoctor.ForwardingEnvironmentPostProcessor
