@@ -21,8 +21,11 @@ public abstract class ZipUtils {
 	}
 
 	private static File[] deduped(File[] fileList) {
-		var dedupeFiles = new HashSet<>(Arrays.asList(fileList));
-		return dedupeFiles.toArray(new File[fileList.length]);
+		var dedupeFiles = new HashSet<File>();
+		for (var ff : fileList)
+			if (ff != null)
+				dedupeFiles.add(ff);
+		return dedupeFiles.toArray(new File[0]);
 	}
 
 	public static void buildZipFileFromFiles(File zipFile, File[] fileList) {
