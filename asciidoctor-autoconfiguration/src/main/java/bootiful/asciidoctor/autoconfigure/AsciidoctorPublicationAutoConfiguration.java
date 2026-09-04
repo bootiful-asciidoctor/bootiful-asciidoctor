@@ -41,6 +41,16 @@ class AsciidoctorPublicationAutoConfiguration {
 		return new HtmlProducer(pp, asciidoctor);
 	}
 
+	/**
+	 * one Markdown file per chapter. This one shells out to {@code pandoc}, so it's
+	 * opt-in.
+	 */
+	@Bean
+	@ConditionalOnProperty(value = "publication.markdown.enabled", havingValue = "true", matchIfMissing = false)
+	DocumentProducer markdownProducer(PublicationProperties pp, Asciidoctor asciidoctor) {
+		return new MarkdownProducer(pp, asciidoctor);
+	}
+
 	@Bean
 	@ConditionalOnProperty(value = "publication.pdf.screen.enabled", havingValue = "true", matchIfMissing = true)
 	DocumentProducer screenPdfProducer(PublicationProperties pp, Asciidoctor asciidoctor) {

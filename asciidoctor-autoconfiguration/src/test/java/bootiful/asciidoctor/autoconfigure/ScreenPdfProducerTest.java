@@ -15,9 +15,6 @@ import java.nio.file.Files;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * The test is skipped, not failed, when that checkout isn't on this machine.
- */
 @EnabledIf("bookIsCheckedOutLocally")
 class ScreenPdfProducerTest {
 
