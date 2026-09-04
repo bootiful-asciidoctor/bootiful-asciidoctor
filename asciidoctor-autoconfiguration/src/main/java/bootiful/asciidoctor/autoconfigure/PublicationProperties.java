@@ -43,7 +43,13 @@ public record PublicationProperties(File root, File target, File code, String bo
 	 * {@code commonmark} or {@code markdown_strict}. A chapter whose markup doesn't
 	 * survive the trip through XML fails the whole run unless
 	 * {@code ignoreBrokenChapters} says to publish the rest without it.
+	 * <p>
+	 * The intermediate DocBook of a chapter that failed is always left on disk to be
+	 * read; {@code keepDocbook} keeps the ones that succeeded as well, which is what you
+	 * want when you're trying to work out why pandoc rendered something the way it did
+	 * rather than why it refused.
 	 */
-	public record Markdown(boolean enabled, File pandoc, String flavor, boolean ignoreBrokenChapters) {
+	public record Markdown(boolean enabled, File pandoc, String flavor, boolean ignoreBrokenChapters,
+			boolean keepDocbook) {
 	}
 }

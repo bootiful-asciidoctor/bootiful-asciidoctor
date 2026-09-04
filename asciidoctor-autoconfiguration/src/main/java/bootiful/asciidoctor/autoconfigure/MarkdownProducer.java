@@ -1,6 +1,7 @@
 package bootiful.asciidoctor.autoconfigure;
 
 import org.asciidoctor.Asciidoctor;
+import org.asciidoctor.ast.Cursor;
 import org.asciidoctor.ast.Section;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 /**
  * Turns each chapter of the book into its own Markdown file.
@@ -32,6 +34,9 @@ class MarkdownProducer implements DocumentProducer {
 	private static final Logger log = LoggerFactory.getLogger(MarkdownProducer.class);
 
 	private static final String DEFAULT_FLAVOR = "gfm";
+
+	/** the opening tag of a fragment, which is where the namespaces have to go */
+	private static final Pattern ROOT_ELEMENT = Pattern.compile("<([A-Za-z_][\\w.-]*)");
 
 	private final PublicationProperties properties;
 
@@ -59,23 +64,37 @@ class MarkdownProducer implements DocumentProducer {
 			var markdown = new File(markdownDirectory, chapter.name() + ".md");
 			Files.writeString(chapterDocbook.toPath(), chapter.docbook(), StandardCharsets.UTF_8);
 			try {
+				// check the XML ourselves first. pandoc catches this too, but it can only
+				// report against the file it was handed; going first lets us describe the
+				// failure in terms of the AsciiDoc that has to change
+				var problem = DocbookDiagnostics.wellFormednessOf(chapter.docbook());
+				if (problem != null) {
+					throw new BrokenChapterException(problem.message(),
+							DocbookDiagnostics.report(chapter, problem, chapterDocbook, root, "the XML parser"));
+				}
 				this.pandoc(pandoc, chapter, chapterDocbook, markdown);
 				log.info("wrote '{}' to {}", chapter.title(), markdown.getAbsolutePath());
 				markdownFiles.add(markdown);
-				chapterDocbook.delete();
+				if (this.keepDocbook()) {
+					log.info("keeping the DocBook for '{}' at {}", chapter.title(), chapterDocbook.getAbsolutePath());
+				}
+				else {
+					chapterDocbook.delete();
+				}
 			}
 			catch (BrokenChapterException bce) {
 				// one chapter's worth of bad markup shouldn't cost you the other thirty,
 				// so keep going and account for all of them at the end. The DocBook stays
 				// on disk: it's the thing you want to read to work out what happened.
-				log.error("could not convert the chapter '{}': {}", chapter.title(), bce.getMessage());
+				log.error("could not convert the chapter '{}'.\n\n{}", chapter.title(), bce.report());
 				broken.add("'" + chapter.title() + "' (see " + chapterDocbook.getAbsolutePath() + ")");
 			}
 		}
 
 		Assert.state(broken.isEmpty() || this.ignoreBrokenChapters(),
 				() -> broken.size() + " of " + chapters.size() + " chapters could not be converted to Markdown: "
-						+ String.join(", ", broken) + ". pandoc rejects DocBook that isn't well formed, and that's "
+						+ String.join(", ", broken) + ". Each one was logged at ERROR above with the line of "
+						+ "AsciiDoc to go and fix. pandoc rejects DocBook that isn't well formed, and that's "
 						+ "almost always overlapping inline markup in the AsciiDoc - an unbalanced ` or a * or _ "
 						+ "inside a `literal` - which HTML and PDF render happily but XML can't express. Fix the "
 						+ "markup, or set publication.markdown.ignore-broken-chapters=true to publish the rest "
@@ -104,22 +123,42 @@ class MarkdownProducer implements DocumentProducer {
 			.buildCommonAttributes(this.properties.bookName(), "(No ISBN required)", this.properties.code())
 			.attribute("idseparator", "-") //
 			.attribute("icons", "font");
-		var options = this.buildCommonOptions("docbook", attributes.build()).docType("book");
+		// sourcemap costs a little to build and buys the one thing the DocBook backend
+		// won't tell us: which file, of all the ones include::d into the book, a chapter
+		// actually came from. Without it a broken chapter can only be named by its title
+		var options = this.buildCommonOptions("docbook", attributes.build()).docType("book").sourcemap(true);
 		var document = this.asciidoctor.loadFile(index, options.build());
 		var chapters = new ArrayList<Chapter>();
 		for (var block : document.getBlocks()) {
 			if (block instanceof Section section && section.getLevel() == 1) {
 				var title = titleOf(section.getTitle(), "chapter");
-				chapters.add(new Chapter(title, "%02d-%s".formatted(chapters.size() + 1, slugify(title)),
-						declare(section.convert())));
+				chapters.add(chapter(title, "%02d-%s".formatted(chapters.size() + 1, slugify(title)), section.convert(),
+						section.getSourceLocation()));
 			}
 		}
 		if (chapters.isEmpty()) {
 			// not every document is a book: one without chapters is one long chapter
 			var title = titleOf(document.getDoctitle(), this.properties.bookName());
-			chapters.add(new Chapter(title, slugify(title), declare(document.convert())));
+			chapters.add(chapter(title, slugify(title), document.convert(), document.getSourceLocation()));
 		}
 		return chapters;
+	}
+
+	/**
+	 * pairs a converted chapter with where it came from, and says so in the log while
+	 * it's at it - when a later chapter turns out to be broken, the line that read it is
+	 * the one that names the file to open.
+	 */
+	private static Chapter chapter(String title, String name, String docbook, Cursor location) {
+		var source = (location != null && location.getFile() != null) ? new File(location.getFile()) : null;
+		var line = location != null ? location.getLineNumber() : 0;
+		if (source != null) {
+			log.info("read the chapter '{}' from {}, line {}", title, source.getAbsolutePath(), line);
+		}
+		else {
+			log.info("read the chapter '{}'; Asciidoctor didn't say which file it came from", title);
+		}
+		return new Chapter(title, name, declare(docbook), source, line);
 	}
 
 	private void pandoc(File pandoc, Chapter chapter, File in, File out) throws Exception {
@@ -129,7 +168,7 @@ class MarkdownProducer implements DocumentProducer {
 				"--wrap=none", //
 				"--output=" + out.getAbsolutePath(), //
 				in.getAbsolutePath());
-		log.debug("running {}", String.join(" ", command));
+		log.info("converting '{}': {}", chapter.title(), String.join(" ", command));
 		var process = new ProcessBuilder(command)//
 			.directory(this.properties.root())//
 			.redirectErrorStream(true)//
@@ -138,7 +177,13 @@ class MarkdownProducer implements DocumentProducer {
 		Assert.state(process.waitFor(5, TimeUnit.MINUTES),
 				() -> "pandoc did not finish converting '" + chapter.title() + "' in time");
 		if (process.exitValue() != 0) {
-			throw new BrokenChapterException("pandoc exited with " + process.exitValue() + ": " + output);
+			// the XML parsed for us and pandoc still won't have it, so this is something
+			// else - a construct it doesn't implement, most likely. Report it the same
+			// way
+			// regardless: its coordinates, if it gave any, against the same excerpts
+			var message = "pandoc exited with " + process.exitValue() + ": " + output;
+			throw new BrokenChapterException(message, DocbookDiagnostics.report(chapter,
+					DocbookDiagnostics.fromPandoc(output), in, this.properties.root(), "pandoc"));
 		}
 		Assert.state(out.exists(), () -> "pandoc produced no " + out.getAbsolutePath());
 		if (StringUtils.hasText(output)) {
@@ -151,7 +196,46 @@ class MarkdownProducer implements DocumentProducer {
 	 * document in its own right, which is what {@code pandoc} wants to be handed.
 	 */
 	private static String declare(String docbook) {
-		return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + docbook;
+		return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + namespaced(docbook);
+	}
+
+	/**
+	 * binds the namespaces the chapter uses but doesn't declare.
+	 * <p>
+	 * Asciidoctor declares them once, on the {@code <book>} element, and converting a
+	 * chapter on its own never produces that element - so a chapter that links to
+	 * anything uses the {@code xl:} prefix without ever binding it. pandoc's reader lets
+	 * that go, but a conforming XML parser is entitled not to, and one of those now reads
+	 * the chapter first. Binding them here makes the fragment the standalone document
+	 * we're already claiming it is, rather than teaching the checker to overlook it.
+	 */
+	private static String namespaced(String docbook) {
+		var matcher = ROOT_ELEMENT.matcher(docbook);
+		if (!matcher.find()) {
+			return docbook;
+		}
+		var end = docbook.indexOf('>', matcher.end());
+		if (end < 0) {
+			return docbook;
+		}
+		var root = docbook.substring(matcher.start(), end);
+		var bindings = new StringBuilder();
+		if (!root.contains("xmlns=")) {
+			bindings.append(" xmlns=\"http://docbook.org/ns/docbook\"");
+		}
+		// both spellings of the XLink prefix, because which one Asciidoctor reaches for
+		// depends on the version, and binding one it doesn't use costs nothing
+		if (!root.contains("xmlns:xl=")) {
+			bindings.append(" xmlns:xl=\"http://www.w3.org/1999/xlink\"");
+		}
+		if (!root.contains("xmlns:xlink=")) {
+			bindings.append(" xmlns:xlink=\"http://www.w3.org/1999/xlink\"");
+		}
+		if (!root.contains("version=")) {
+			bindings.append(" version=\"5.0\"");
+		}
+		return bindings.isEmpty() ? docbook
+				: docbook.substring(0, matcher.end()) + bindings + docbook.substring(matcher.end());
 	}
 
 	private static String titleOf(String title, String fallback) {
@@ -166,6 +250,15 @@ class MarkdownProducer implements DocumentProducer {
 	private boolean ignoreBrokenChapters() {
 		var markdown = this.properties.markdown();
 		return markdown != null && markdown.ignoreBrokenChapters();
+	}
+
+	/**
+	 * a broken chapter's DocBook is always left behind; this keeps the ones that
+	 * converted too, for when you want to read what pandoc was actually given.
+	 */
+	private boolean keepDocbook() {
+		var markdown = this.properties.markdown();
+		return markdown != null && markdown.keepDocbook();
 	}
 
 	/**
@@ -194,13 +287,25 @@ class MarkdownProducer implements DocumentProducer {
 		return StringUtils.hasText(slug) ? slug : "chapter";
 	}
 
-	private record Chapter(String title, String name, String docbook) {
+	/**
+	 * a converted chapter and the {@code .adoc} it was read from. {@code source} is null,
+	 * and {@code sourceLine} zero, only when Asciidoctor wouldn't say.
+	 */
+	record Chapter(String title, String name, String docbook, File source, int sourceLine) {
 	}
 
 	private static class BrokenChapterException extends RuntimeException {
 
-		BrokenChapterException(String message) {
+		/** the long form: coordinates, excerpts and a guess at the cause */
+		private final String report;
+
+		BrokenChapterException(String message, String report) {
 			super(message);
+			this.report = report;
+		}
+
+		String report() {
+			return this.report;
 		}
 
 	}
