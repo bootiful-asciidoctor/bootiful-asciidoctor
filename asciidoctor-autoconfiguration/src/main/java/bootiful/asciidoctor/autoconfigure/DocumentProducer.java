@@ -18,6 +18,14 @@ public interface DocumentProducer {
 		return new File(root, "index.adoc");
 	}
 
+	/**
+	 * Note that {@code imagesdir} is deliberately not set here. Attributes handed to
+	 * Asciidoctor through the API are locked, so setting it would both prepend
+	 * {@code images/} to every image a document already spells out in full - giving
+	 * {@code images/images/...}, which resolves to nothing - and leave the document no
+	 * way to say otherwise. A document that wants one declares {@code :imagesdir:} in its
+	 * own header.
+	 */
 	default AttributesBuilder buildCommonAttributes(String bookName, String isbn, File source) {
 
 		return Attributes.builder()//
@@ -30,7 +38,6 @@ public interface DocumentProducer {
 			.attribute("code", source.getAbsolutePath()) //
 			.tableOfContents(true) //
 			.sectionNumbers(true) //
-			.imagesDir("images") //
 			.sourceHighlighter("coderay");
 	}
 
