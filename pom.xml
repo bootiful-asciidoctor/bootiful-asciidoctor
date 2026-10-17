@@ -95,6 +95,14 @@
                 </executions>
             </plugin>
             <plugin>
+                <!-- the tests assert on the JDK's XML parser messages, which follow the default locale -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>-Duser.language=en -Duser.country=US</argLine>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.jfrog.buildinfo</groupId>
                 <artifactId>artifactory-maven-plugin</artifactId>
                 <version>3.5.1</version>
