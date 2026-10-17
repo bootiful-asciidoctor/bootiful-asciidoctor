@@ -4,6 +4,7 @@ import bootiful.asciidoctor.git.CredentialsProviderGitCloneCallback;
 import bootiful.asciidoctor.git.CredentialsProviderGitPushCallback;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
@@ -17,6 +18,10 @@ import java.util.Map;
  * @author Josh Long
  * @author Trisha Gee
  */
+@EnabledIfEnvironmentVariable(named = "GIT_REPOSITORY_URI", matches = ".+")
+@EnabledIfEnvironmentVariable(named = "GIT_ARTIFACT_BRANCH", matches = ".+")
+@EnabledIfEnvironmentVariable(named = "GIT_USERNAME", matches = ".+")
+@EnabledIfEnvironmentVariable(named = "GIT_PASSWORD", matches = ".+")
 class GitBranchDocumentPublisherTest {
 
 	private File fileFromClassPathPath(String path) {

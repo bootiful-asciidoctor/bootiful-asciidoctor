@@ -1,6 +1,7 @@
 package bootiful.asciidoctor.publishers;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.core.io.ClassPathResource;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -15,6 +16,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+@EnabledIfEnvironmentVariable(named = "AWS_ACCESS_KEY_ID", matches = ".+")
+@EnabledIfEnvironmentVariable(named = "AWS_SECRET_ACCESS_KEY", matches = ".+")
+@EnabledIfEnvironmentVariable(named = "AWS_REGION", matches = ".+")
+@EnabledIfEnvironmentVariable(named = "AWS_BUCKET_NAME", matches = ".+")
 class AwsS3DocumentPublisherTest {
 
 	@Test
